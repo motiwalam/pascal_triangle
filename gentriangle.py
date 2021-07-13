@@ -21,7 +21,7 @@ base = \
             E.STYLE("""
                 div.triangle {{
                     overflow-x: hidden;
-                    overflow-y: scroll;
+                    overflow-y: auto;
                     width: 95%;
                     height: 95%;
                     margin: 0 auto;
