@@ -67,14 +67,25 @@ base = \
                     height: auto;
                     z-index: 100;
                     font-size: 150%;
+
+                ::-webkit-scrollbar-thumb {{
+                    border-radius: 3px;
+                }}
                 }}
             """.format(100/(MINROW+1), 100/(MINROW+1)+2))
         ),
 
         E.BODY(
             E.DIV(
-                E.CLASS("triangle")
-            )
+                E.CLASS("triangle"), id="container"
+            ),
+
+            onload = """
+                c = document.getElementById("container")
+                for (d of c.children) {
+                    d.scrollLeft = d.scrollLeftMax / 2
+                }
+            """
         )
     )
 
