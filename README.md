@@ -27,3 +27,4 @@ Below are links to all of the triangles available in this repository.
 * [Row 400](https://thechosenreader.github.io/pascal_triangle/triangles/400.html)
 * [Row 450](https://thechosenreader.github.io/pascal_triangle/triangles/450.html)
 * [Row 500](https://thechosenreader.github.io/pascal_triangle/triangles/500.html)
+* [Row 1000](https://thechosenreader.github.io/pascal_triangle/triangles/1000.html)
