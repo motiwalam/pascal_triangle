@@ -5,6 +5,8 @@ Two Python scripts that can write and read individual rows of Pascal's triangle 
 ## Algorithm
 `rowpascal.py` generates the target row by relying on the fact that `nCr(n, r+1) / nCr(n, r) = (n-r)/(r+1)`. Previous versions of the algorithm also made use of the fact that each row is symmetrical but that was done away with in the interest of not blowing my computer up (larger rows take literal gigabytes of space).
 
+`pasc_latex.py` uses the recursive approach with a generator to create arbitrarily large triangles without a significant memory footprint. The code for it is not mine and comes from [here](https://www.bedroomlan.org/coding/pascals-triangle-latex/)
+
 ## File Format
 Speaking of space, I store each row in a custom file format which interleaves the raw bytes of each number in the row with 4 bytes that instruct the program on how many bytes to read the get the next number. It's not much but it cuts space consumption by about 2.5.
 

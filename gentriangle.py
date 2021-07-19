@@ -10,6 +10,8 @@ from lxml.html import builder as E
 
 from readpascal import read_row
 
+from pasc_latex import pascal
+
 # the minimum row that should be fully contained on the screen, i.e without
 # having to scroll
 MINROW = 25
@@ -109,6 +111,12 @@ def create_document(files):
         container.append(create_row(read_row(f)))
 
 
+def create_document2(n):
+    container = base.find_class("triangle")[0]
+
+    for r in pascal(n):
+        container.append(create_row(r))
+
 def create_parser():
     p = argparse.ArgumentParser()
 
@@ -118,6 +126,7 @@ def create_parser():
     p.add_argument("-p", "--prefix", type=str, default="./", help="path prefix in which to look for files if --maxrow was specified")
     p.add_argument("-s", "--suffix", type=str, default=".rpas", help="specify the suffix for row files, including the dot")
 
+    p.add_argument("-t", "--type", type=int, default=1)
 
     p.add_argument("-o", "--out", type=str, default="stdout", help="where to write output")
     return p
@@ -126,15 +135,19 @@ def create_parser():
 def main():
     args = create_parser().parse_args()
 
-    if (not (args.files or args.maxrow)):
-        print("You have to supply either a list of files or a maxrow as a range")
-        quit()
-
-    if (args.files):
-        create_document(args.files)
+    if (args.type == 2):
+        create_document2(args.maxrow)
 
     else:
-        create_document([ args.prefix + str(i) + args.suffix for i in range(args.maxrow+1)])
+        if (not (args.files or args.maxrow)):
+            print("You have to supply either a list of files or a maxrow as a range")
+            quit()
+
+        if (args.files):
+            create_document(args.files)
+
+        else:
+            create_document([ args.prefix + str(i) + args.suffix for i in range(args.maxrow+1)])
 
     with (open(args.out, "wb") if args.out != "stdout" else sys.stdout.buffer as out):
         out.write(html.tostring(base))
