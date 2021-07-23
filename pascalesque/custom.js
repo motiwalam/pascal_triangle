@@ -282,7 +282,7 @@ function main() {
 
   cont = document.getElementById("tri_container");
 
-  pathsComputer = new Worker("/pascal_triangle/paths/computer.js");
+  pathsComputer = new Worker("/pascal_triangle/pascalesque/computer.js");
   pathsComputer.onmessage = m => {
     // console.log(m);
     switch (m.data.type) {
