@@ -1,0 +1,51 @@
+<html>
+
+  <head>
+    <title>Pascal-esque Triangles</title>
+    <link rel="stylesheet" href="/pascal_triangle/pascalesque/triangles.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js"></script>
+
+    <script src="/pascal_triangle/pascalesque/custom.js"></script>
+    <script src="/pascal_triangle/pascalesque/path.js"></script>
+  </head>
+
+  <body onload="main();">
+
+    <div class="triangle" id="tri_container"></div>
+
+    <div class="interface">
+      Colour Cycle Mode: <select id="colorcycle">
+              <option disabled selected value="poop"> -- how to cycle -- </option>
+              <option value="nocycle">NO CYCLE</option>
+              <option value="paths">BETWEEN PATHS</option>
+              <option value="blocks">BETWEEN BLOCKS</option>
+            </select>
+    </div>
+
+    <div class="interface">
+      Animation speed (ms):  <span id="anim_speed_label" style="width: 10px; display: inline-block;"></span>
+      <input type="range" id="anim_speed" min="10" max="2500" value=500 style="margin-left: 30px">
+    </div>
+
+
+    <button style="width: 125;" type="submit" id="arr_button" class="mybutton" onclick="toggle_arrangement();">Hide</button>
+    <button style="width: 110;" type="submit" id="anim_button" class="mybutton" onmouseleave="_on_anim_button_mouseleave();" onmouseover="test_can_animate();" onclick="toggle_animate();">Animate</button>
+
+    <br>
+    <pre style="display: inline;" id="pathscount">Total Paths: </pre>
+    <div class="interface" id="arr_container">
+
+        <textarea id="arr_input" rows=20 cols=44 placeholder="One row per line. Row elements are space separated..."></textarea>
+
+        <button type="submit" onclick="create_arrangement();">Create</button>
+        <button type="submit" onclick="choose_random_arrangement();">Random</button>
+
+        <select id="pre_options" onchange="">
+          <option disabled selected value="poop"> -- predefined arrangements -- </option>
+        </select>
+
+    </div>
+
+  </body>
+
+</html>

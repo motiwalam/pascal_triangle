@@ -1,0 +1,92 @@
+div.triangle {
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 85%;
+    height: 85%;
+    margin: 0 auto;
+    scrollbar-width: thin;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+div.row {
+    height: 4.761904761904762%;
+    overflow-y: hidden;
+    overflow-x: auto;
+    text-align: center;
+    white-space: nowrap;
+    scrollbar-width: thin;
+}
+
+div.elem {
+    border: 1px solid #e1c2c2;
+    width: 4.761904761904762%;
+    height: 80%;
+    display: inline-block;
+    position: relative;
+}
+
+div.elem pre {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 80%;
+    margin: 0;
+    position: absolute;
+    font-size: 14px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+div.elem pre:hover {
+    overflow: visible;
+    background-color: rgb(241, 157, 67);
+    width: auto;
+    height: auto;
+    z-index: 100;
+    font-size: 200%;
+
+::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+  }
+}
+
+button.mybutton {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 7px;
+  position: relative;
+  z-index: 100;
+
+}
+
+div.interface {
+  position: relative;
+  width: 350;
+  margin-top: 5px;
+}
+
+#anim_speed {
+  position: absolute;
+  top: 50%;
+  transform: translate(0%, -60%);
+}
+
+
+span.pbc {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  font-size: 8px;
+}
+
+span.pbc:hover {
+  overflow: visible;
+  background-color: rgb(97, 225, 9);
+  width: auto;
+  height: auto;
+  z-index: 100;
+  font-size: 150%;
+}
