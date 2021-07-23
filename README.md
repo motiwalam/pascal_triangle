@@ -28,3 +28,9 @@ Below are links to all of the triangles available in this repository.
 * [Row 450](https://thechosenreader.github.io/pascal_triangle/triangles/450.html)
 * [Row 500](https://thechosenreader.github.io/pascal_triangle/triangles/500.html)
 * [Row 1000](https://thechosenreader.github.io/pascal_triangle/triangles/1000.html)
+
+
+# Pascal-esque triangles
+These are triangles where the difference of two consecutive rows' lengths is -1 or 1. This enables both unambiguous diagonal traversal, the way one does in Pascal's triangle (this requires an odd difference), while also guaranteeing every block in the triangle is reachable. It also has the not at all coincidental side-effect of being very easy to traverse.
+
+Play around with Pascal-esque triangles [here](https://thechosenreader.github.io/pascal_triangle/pascalesque/)
