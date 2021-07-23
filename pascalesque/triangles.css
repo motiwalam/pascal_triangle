@@ -3,34 +3,32 @@
   position: relative;
 }
 div.triangle {
-    justify-content: safe center;
-    overflow: scroll;
+    overflow: auto;
     white-space: nowrap;
-    width: 85%;
+    width: 70%;
     height: 85%;
     margin: 0 auto;
     scrollbar-width: thin;
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-35%, -50%);
     text-align: center;
-    align-items: center;
 }
 
 div.row {
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
     height: 4.761904761904762%;
     text-align: center;
     z-index: -1;
     white-space: nowrap;
+    display: flex;
+    width: min-content;
 }
 
 div.elem {
     border: 1px solid #e1c2c2;
-    width: 4.761904761904762%;
+    width: 80px;
     height: 80%;
     display: inline-block;
     position: relative;

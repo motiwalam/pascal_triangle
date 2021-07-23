@@ -1,6 +1,7 @@
 _CURRENT_ARRANGEMENT = [];
 _PATHS = [];
 _PER_BLOCK_COUNT = {};
+_BLOCKED = "@X";
 
 previdx = curidx = 0;
 
@@ -10,7 +11,7 @@ importScripts("/pascal_triangle/pascalesque/path.js");
 function compute_paths() {
     _PATHS = [];
     _PER_BLOCK_COUNT = {};
-    var c = {CURRENT_ARRANGEMENT: _CURRENT_ARRANGEMENT, PATHS: _PATHS, PER_BLOCK_COUNT: _PER_BLOCK_COUNT};
+    var c = {CURRENT_ARRANGEMENT: _CURRENT_ARRANGEMENT, PATHS: _PATHS, PER_BLOCK_COUNT: _PER_BLOCK_COUNT, BLOCKED: _BLOCKED};
     for (i of _.range(_CURRENT_ARRANGEMENT[0].length)) {
       var start = new Elem(0, i, c);
       start.compute_paths([start]);
@@ -24,6 +25,7 @@ onmessage = function (m) {
   switch (m.data.type) {
     case "computePaths":
     _CURRENT_ARRANGEMENT = m.data.current_arrangement;
+    _BLOCKED = m.data.blocked;
     compute_paths();
     break;
 

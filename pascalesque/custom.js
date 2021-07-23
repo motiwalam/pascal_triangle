@@ -85,9 +85,45 @@ A A
 N`,
 
 row_n:`$pascal ROW
-replace row above with row number then click Create to generate Pascal's triangle up to that row
-be warned that this may freeze your computer for large (> ~30) row numbers`,
 
+replace row above with row number then click Create to generate Pascal's triangle up to that row
+
+large (> ~30) row numbers can freeze your computer due to the huge number of paths
+
+click 'w/o paths' to see just the triangle`,
+
+punctuation:`.
+\\ \\
+< < <
+<< << << <<
+$ $ $ $ $
+>> >> >> >>
+> > >
+/ /
+.`,
+
+datamgmt:`D D D D
+A A A
+T T
+A
+M M
+A A A
+N N N N
+A A A A A
+G G G G G G
+E E E E E
+M M M M
+E E E
+N N
+T`,
+
+forbidden: `S
+1 1
+1 2 1
+1 3 3 1
+1 4 @X 4 @X
+@X 5 4 4 4 @X
+@X 5 9 8 8 @X @X`,
 custom: ''
 }
 
@@ -101,10 +137,13 @@ NUMPATHS = 0;
 PATHS_READY = false;
 ANIMATION_INTERVAL_ID = -1;
 
+BLOCKED="@X";
+
 function _on_anim_button_mouseleave() {
     var b = document.getElementById("anim_button");
     b.innerHTML = ANIMATION_INTERVAL_ID === -1 ? "Animate" : "Stop Animating";
     b.disabled = false;
+    b.style.width = 110;
 }
 
 function toggle_animate() {
@@ -140,27 +179,52 @@ function set_arrangement(v) {
   document.getElementById("arr_input").value = v === undefined ? "" : v;
 }
 
-function create_arrangement() {
+async function create_arrangement(compute=true) {
     if (ANIMATION_INTERVAL_ID !== -1) {
       toggle_animate()
     }
-    // clear the triangle container
-    cont.innerHTML = "";
 
-    CURRENT_ARRANGEMENT = parseInput(document.getElementById("arr_input").value)
-    for (var ridx of _.range(CURRENT_ARRANGEMENT.length)) {
-      var r = CURRENT_ARRANGEMENT[ridx];
-      cont.appendChild(create_row(r, ridx));
-    }
+    setTimeout(async () => {
+      CURRENT_ARRANGEMENT = await parseInput(document.getElementById("arr_input").value);
+      console.log(CURRENT_ARRANGEMENT);
+      console.log(BLOCKED);
+      // clear the triangle container
+      cont.innerHTML = "";
+      for (var ridx of _.range(CURRENT_ARRANGEMENT.length)) {
+        var r = CURRENT_ARRANGEMENT[ridx];
+        cont.appendChild(create_row(r, ridx));
+      }
 
-    var pl = document.getElementById("pathscount");
-    PATHS_READY = false;
-    if (row_length_differences_are_1(CURRENT_ARRANGEMENT)) {
-      pl.innerHTML="Total Paths: computing...";
-      pathsComputer.postMessage({type: "computePaths", current_arrangement: CURRENT_ARRANGEMENT})
-    } else {
-      pl.innerHTML = "Total Paths: ? (arrangement is not Pascal-esque; row lengths must differ by 1)"
-    }
+      var pl = document.getElementById("pathscount");
+
+      if (compute) {
+        PATHS_READY = false;
+        if (row_length_differences_are_1(CURRENT_ARRANGEMENT)) {
+          pl.innerHTML="computing...";
+          pathsComputer.postMessage({type: "computePaths", current_arrangement: CURRENT_ARRANGEMENT, blocked: BLOCKED})
+        } else {
+          pl.innerHTML = "? (arrangement is not Pascal-esque; row lengths must differ by 1)"
+        }
+      } else {
+        pl.innerHTML="not computing..";
+      }
+
+      center_arrangement();
+
+    }, 0)
+
+}
+
+function center_arrangement() {
+
+  var rows = cont.children;
+  var longest_width = _.max(rows, (r)=>{return r.offsetWidth}).offsetWidth;
+
+  for (var r of rows) {
+    r.style.left = (longest_width - r.offsetWidth) / 2;
+  }
+
+  cont.scrollLeft = cont.scrollLeftMax / 2;
 }
 
 function row_length_differences_are_1(tri) {
@@ -175,11 +239,12 @@ function row_length_differences_are_1(tri) {
 
 function test_can_animate() {
     var b = document.getElementById("anim_button");
-
     if (!row_length_differences_are_1(CURRENT_ARRANGEMENT)) {
+      b.style.width="auto";
       b.disabled = true;
       b.innerHTML = "Invalid Pascal-esque triangle. Row differences are not 1.";
     } else if (!PATHS_READY) {
+      b.style.width="auto";
       b.disabled = true;
       b.innerHTML = "just a minute, still computing.."
     }
@@ -203,13 +268,13 @@ function pascal(n) {
 }
 
 
-function parseInput(s) {
+async function parseInput(s) {
   if (s.trim().startsWith("$pascal ")) {
     try {
       var n = parseInt(s.trim().split(" ")[1]);
       if (!isNaN(n)) {
         var t = pascal(n);
-        set_arrangement( _.map(t, r=>{return r.join(" ")}).join("\n") );
+        setTimeout(()=>{set_arrangement( _.map(t, r=>{return r.join(" ")}).join("\n"))}, 0);
         return t;
       }
     } catch (e) {}
@@ -235,8 +300,16 @@ function create_row(r, ridx) {
       n.className = "elem";
       n.id = `${ridx};${eidx}`
 
+      if (e === BLOCKED) {n.style.backgroundColor="rgb(185, 185, 185)"}
+
       var np = document.createElement("pre");
-      np.innerHTML = e;
+      np.innerHTML = np._innerHTML = e;
+      np._pos = n.id;
+
+      np.addEventListener("mouseover", (ev) =>
+          {var e = ev.originalTarget; e.innerHTML = `<span style="font-size: 8px;">(${e._pos})</span>${e._innerHTML}`;})
+
+      np.addEventListener("mouseout", (ev) => {var e = ev.originalTarget; e.innerHTML = e._innerHTML;})
 
       n.appendChild(np);
       out.appendChild(n);
@@ -262,14 +335,16 @@ function draw_next_path() {
 }
 
 function add_per_block_counts(pbc) {
-  for (var [id, v] of _.pairs(pbc)) {
-    var e = document.getElementById(id);
+  for (var row of cont.children) {
+    for (var e of row.children) {
+      var id = e.id;
 
-    var c = document.createElement("span");
-    c.className = "pbc"
-    c.innerHTML = v;
+      var c = document.createElement("span");
+      c.className = "pbc";
+      c.innerHTML = _.has(pbc, id) ? pbc[id] : 0;
 
-    e.appendChild(c);
+      e.appendChild(c);
+    }
   }
 }
 
@@ -284,14 +359,19 @@ function main() {
       case "pathsComputed":
       NUMPATHS = m.data.numpaths;
       PATHS_READY = true;
-      document.getElementById("pathscount").innerHTML=`Total Paths: ${NUMPATHS}`;
+      document.getElementById("pathscount").innerHTML=NUMPATHS;
       add_per_block_counts(m.data.pbc);
       break;
 
       case "nextPath":
+      console.log(m);
       cselect = document.getElementById("colorcycle");
       draw_path(m.data.prevpath, "", false);
       draw_path(m.data.path, cselect.value === "nocycle" ? "rgba(65, 223, 208, 255)" : get_next_color(), cselect.value === "blocks");
+      break;
+
+      case "test":
+      console.log(m);
       break;
     }
   }
@@ -313,7 +393,5 @@ function main() {
   slider_label = document.getElementById("anim_speed_label");
   slider_label.innerHTML = slider.value;
   slider.oninput = () => {slider_label.innerHTML = slider.value; toggle_animate(); toggle_animate()}
-
-
 
 }

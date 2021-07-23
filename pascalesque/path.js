@@ -4,16 +4,27 @@ class Elem {
     this.r = r;
     this.context = context;
 
-    if (this.r >= 0 && this.r < this.context.CURRENT_ARRANGEMENT[this.n].length) {
+    // console.log(this.context);
+
+    if (this.r >= 0
+        && this.r < this.context.CURRENT_ARRANGEMENT[this.n].length) {
+
       var id = this.id();
-      if (_.has(this.context.PER_BLOCK_COUNT, id))
-      this.context.PER_BLOCK_COUNT[id] += 1;
-      else
-      this.context.PER_BLOCK_COUNT[id] = 1;
+      if (this.context.CURRENT_ARRANGEMENT[this.n][this.r] === this.context.BLOCKED) {
+        this.context.PER_BLOCK_COUNT[id] = 0;
+      } else {
+        if (_.has(this.context.PER_BLOCK_COUNT, id))
+          this.context.PER_BLOCK_COUNT[id] += 1;
+        else
+          this.context.PER_BLOCK_COUNT[id] = 1;
+      }
     }
   }
 
   compute_paths(curpath) {
+    if (this.context.CURRENT_ARRANGEMENT[this.n][this.r] === this.context.BLOCKED) {
+      return;
+    }
 
     if (this.n == this.context.CURRENT_ARRANGEMENT.length-1) {
       this.context.PATHS.push(new Path(curpath));
