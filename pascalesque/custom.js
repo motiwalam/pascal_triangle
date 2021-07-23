@@ -197,8 +197,8 @@ async function create_arrangement(compute=true) {
 
       var pl = document.getElementById("pathscount");
 
+      PATHS_READY = false;
       if (compute) {
-        PATHS_READY = false;
         if (row_length_differences_are_1(CURRENT_ARRANGEMENT)) {
           pl.innerHTML="computing...";
           pathsComputer.postMessage({type: "computePaths", current_arrangement: CURRENT_ARRANGEMENT, blocked: BLOCKED})
@@ -246,7 +246,7 @@ function test_can_animate() {
     } else if (!PATHS_READY) {
       b.style.width="auto";
       b.disabled = true;
-      b.innerHTML = "just a minute, still computing.."
+      b.innerHTML = "no paths available.."
     }
 
 }
