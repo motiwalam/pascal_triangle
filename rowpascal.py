@@ -32,6 +32,21 @@ def writeRow(n, fn):
             out.write(struct.pack(">I", nb))
             out.write(getbytes(rcoeff, nb))
 
+
+def rowpascal(n):
+    """create and return a row stored in memory"""
+    out = [1] + [0]*n
+
+    ndiv2 = n // 2
+    rcoeff = 1
+
+    for i in range(1, n+1):
+        result = out[n-i] if i > ndiv2 else (rcoeff := rcoeff * (n-i+1)//i)
+        out[i] = result
+
+    return out
+
+
 def main():
     n = int(sys.argv[1])
     fn = sys.argv[2]

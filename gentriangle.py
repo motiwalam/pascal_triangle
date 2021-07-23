@@ -11,6 +11,8 @@ from lxml.html import builder as E
 from readpascal import read_row
 
 from pasc_latex import pascal
+from rowpascal import rowpascal
+
 
 # the minimum row that should be fully contained on the screen, i.e without
 # having to scroll
@@ -117,6 +119,14 @@ def create_document2(n):
     for r in pascal(n):
         container.append(create_row(r))
 
+
+def create_document3(n):
+    container = base.find_class("triangle")[0]
+
+    for r in range(n):
+        container.append(create_row(rowpascal(r)))
+
+
 def create_parser():
     p = argparse.ArgumentParser()
 
@@ -126,7 +136,7 @@ def create_parser():
     p.add_argument("-p", "--prefix", type=str, default="./", help="path prefix in which to look for files if --maxrow was specified")
     p.add_argument("-s", "--suffix", type=str, default=".rpas", help="specify the suffix for row files, including the dot")
 
-    p.add_argument("-t", "--type", type=int, default=1)
+    p.add_argument("-t", "--type", type=int, default=1, help="type 1: read rows from .rpas files, type 2: use recursive generator approach, type 3: use iterative approach but generate rows on the fly, in memory")
 
     p.add_argument("-o", "--out", type=str, default="stdout", help="where to write output")
     return p
@@ -137,6 +147,9 @@ def main():
 
     if (args.type == 2):
         create_document2(args.maxrow)
+
+    elif (args.type == 3):
+        create_document3(args.maxrow)
 
     else:
         if (not (args.files or args.maxrow)):
