@@ -5,7 +5,7 @@ _PER_BLOCK_COUNT = {};
 previdx = curidx = 0;
 
 importScripts("https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js");
-importScripts("/pascal_triangle/paths/path.js");
+importScripts("/pascal_triangle/pascalesque/path.js");
 
 function compute_paths() {
     _PATHS = [];
