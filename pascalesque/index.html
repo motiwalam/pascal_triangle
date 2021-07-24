@@ -33,7 +33,7 @@
 
     <div class="interface" id="arr_container">
         Total Paths: <pre style="display: inline;" id="pathscount"></pre>
-        <textarea id="arr_input" rows=20 cols=44 placeholder=
+        <textarea style="width: 100%" id="arr_input" rows=20 cols=44 placeholder=
 "Enter one row per line.
 Row elements are space separated.
 @X denotes a forbidden block.
@@ -41,13 +41,18 @@ Row elements are space separated.
 '$invert' as the first line will invert the following arrangement"
         ></textarea>
 
-        <button type="submit" onclick="create_arrangement();">w/ paths</button>
-        <button type="submit" onclick="create_arrangement(false);">w/o paths</button>
-        <button type="submit" onclick="choose_random_arrangement();">Random</button>
+        <div class="intcontainer">
+          <button class="binterface" style="background-color: rgba(39,234,28,255)" type="submit" onclick="create_arrangement();">Create w/ paths</button>
+          <button class="binterface" style="background-color: rgba(5,219,199,255)" type="submit" onclick="create_arrangement(false);">Create w/o paths</button>
+        </div>
 
-        <select id="pre_options" onchange="">
+        <div class="intcontainer">
+        <button class="binterface" style="background-color: rgba(255,180,2,0.7)" type="submit" onclick="choose_random_arrangement();">Random</button>
+
+        <select class="mymenu" style="background: rgba(206,147,255,255); background-color: rgba(206,147,255,255)" id="pre_options" onchange="">
           <option disabled selected value="poop"> -- examples -- </option>
         </select>
+      </div>
 
     </div>
 

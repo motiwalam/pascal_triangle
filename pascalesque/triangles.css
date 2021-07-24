@@ -68,9 +68,34 @@ button.mybutton {
 
 }
 
+button.binterface {
+  width: 125px;
+  border: hidden;
+}
+
+button.binterface:hover {
+  opacity: 75%;
+}
+
+select.mymenu {
+  border: hidden;
+  width: 125px;
+}
+
+select.mymenu:hover {
+  opacity: 75%;
+}
+
 div.interface {
   position: relative;
   width: 350;
+  margin-top: 5px;
+}
+
+div.intcontainer {
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
   margin-top: 5px;
 }
 

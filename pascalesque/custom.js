@@ -90,7 +90,7 @@ replace row above with row number then click Create to generate Pascal's triangl
 
 large (> ~30) row numbers can freeze your computer due to the huge number of paths
 
-click 'w/o paths' to see just the triangle`,
+create w/o paths to see just the triangle`,
 
 punctuation:`.
 \\ \\
@@ -136,7 +136,7 @@ H H H H H H`,
 
 invert:`#$invert
 $pascal 15
-delete the hashtag and click Create to see what happens`,
+delete the hashtag and click create to see what happens`,
 custom: ''
 }
 
@@ -242,7 +242,7 @@ function center_arrangement() {
 function row_length_differences_are_1(tri) {
   for ([r1, r2] of _.zip(tri, tri.slice(1))) {
     if (r2 !== undefined) {
-      if (Math.abs(r2.length - r1.length) %2 !== 1) { return false; }
+      if (Math.abs(r2.length - r1.length) !== 1) { return false; }
     }
   }
 
