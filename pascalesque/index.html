@@ -33,9 +33,15 @@
 
     <div class="interface" id="arr_container">
         Total Paths: <pre style="display: inline;" id="pathscount"></pre>
-        <textarea id="arr_input" rows=20 cols=44 placeholder="Enter one row per line. Row elements are space separated. @X denotes a forbidden block."></textarea>
+        <textarea id="arr_input" rows=20 cols=44 placeholder=
+"Enter one row per line.
+Row elements are space separated.
+@X denotes a forbidden block.
+@D denotes a skipped block (like in checkers).
+'$invert' as the first line will invert the following arrangement"
+        ></textarea>
 
-        <button type="submit" onclick="create_arrangement();">Create</button>
+        <button type="submit" onclick="create_arrangement();">w/ paths</button>
         <button type="submit" onclick="create_arrangement(false);">w/o paths</button>
         <button type="submit" onclick="choose_random_arrangement();">Random</button>
 

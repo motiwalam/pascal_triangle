@@ -1,19 +1,17 @@
 _CURRENT_ARRANGEMENT = [];
 _PATHS = [];
-_PER_BLOCK_COUNT = {};
-_BLOCKED = "@X";
 
 previdx = curidx = 0;
 
 importScripts("https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js");
 importScripts("/pascal_triangle/pascalesque/path.js");
 
-function compute_paths() {
+function compute_paths(_BLOCKED, _SKIP) {
     _PATHS = [];
-    _PER_BLOCK_COUNT = {};
-    var c = {CURRENT_ARRANGEMENT: _CURRENT_ARRANGEMENT, PATHS: _PATHS, PER_BLOCK_COUNT: _PER_BLOCK_COUNT, BLOCKED: _BLOCKED};
+    var _PER_BLOCK_COUNT = {};
+    var c = {CURRENT_ARRANGEMENT: _CURRENT_ARRANGEMENT, PATHS: _PATHS, PER_BLOCK_COUNT: _PER_BLOCK_COUNT, BLOCKED: _BLOCKED, SKIP: _SKIP};
     for (i of _.range(_CURRENT_ARRANGEMENT[0].length)) {
-      var start = new Elem(0, i, c);
+      var start = new Elem(0, i, "right", c);
       start.compute_paths([start]);
     }
     previdx = curidx = 0;
@@ -25,8 +23,7 @@ onmessage = function (m) {
   switch (m.data.type) {
     case "computePaths":
     _CURRENT_ARRANGEMENT = m.data.current_arrangement;
-    _BLOCKED = m.data.blocked;
-    compute_paths();
+    compute_paths(m.data.blocked, m.data.skip);
     break;
 
     case "getNextPath":

@@ -124,6 +124,19 @@ forbidden: `S
 1 4 @X 4 @X
 @X 5 4 4 4 @X
 @X 5 9 8 8 @X @X`,
+
+skip: `A
+B B
+C C C
+D @D @D D
+E E E E E
+@D F F @D
+G G @D G G
+H H H H H H`,
+
+invert:`#$invert
+$pascal 15
+delete the hashtag and click Create to see what happens`,
 custom: ''
 }
 
@@ -138,6 +151,7 @@ PATHS_READY = false;
 ANIMATION_INTERVAL_ID = -1;
 
 BLOCKED="@X";
+SKIP = "@D";
 
 function _on_anim_button_mouseleave() {
     var b = document.getElementById("anim_button");
@@ -186,8 +200,6 @@ async function create_arrangement(compute=true) {
 
     setTimeout(async () => {
       CURRENT_ARRANGEMENT = await parseInput(document.getElementById("arr_input").value);
-      console.log(CURRENT_ARRANGEMENT);
-      console.log(BLOCKED);
       // clear the triangle container
       cont.innerHTML = "";
       for (var ridx of _.range(CURRENT_ARRANGEMENT.length)) {
@@ -201,7 +213,7 @@ async function create_arrangement(compute=true) {
       if (compute) {
         if (row_length_differences_are_1(CURRENT_ARRANGEMENT)) {
           pl.innerHTML="computing...";
-          pathsComputer.postMessage({type: "computePaths", current_arrangement: CURRENT_ARRANGEMENT, blocked: BLOCKED})
+          pathsComputer.postMessage({type: "computePaths", current_arrangement: CURRENT_ARRANGEMENT, blocked: BLOCKED, skip: SKIP})
         } else {
           pl.innerHTML = "? (arrangement is not Pascal-esque; row lengths must differ by 1)"
         }
@@ -230,7 +242,7 @@ function center_arrangement() {
 function row_length_differences_are_1(tri) {
   for ([r1, r2] of _.zip(tri, tri.slice(1))) {
     if (r2 !== undefined) {
-      if (Math.abs(r2.length - r1.length) !== 1) { return false; }
+      if (Math.abs(r2.length - r1.length) %2 !== 1) { return false; }
     }
   }
 
@@ -269,9 +281,12 @@ function pascal(n) {
 
 
 async function parseInput(s) {
-  if (s.trim().startsWith("$pascal ")) {
+  s = s.trim();
+  var lines = s.split("\n");
+  console.log(lines);
+  if (s.startsWith("$pascal ")) {
     try {
-      var n = parseInt(s.trim().split(" ")[1]);
+      var n = parseInt(s.split(" ")[1]);
       if (!isNaN(n)) {
         var t = pascal(n);
         setTimeout(()=>{set_arrangement( _.map(t, r=>{return r.join(" ")}).join("\n"))}, 0);
@@ -280,7 +295,9 @@ async function parseInput(s) {
     } catch (e) {}
     return parseInput("pascal row");
   }
-  return _.filter(_.map(s.trim().split("\n"), e=>{return e.trim().split(" ").filter(c=>{return c!==""})}), l=>{return l.length>0})
+  return lines[0].trim() === "$invert"
+              ? (await parseInput(lines.slice(1).join("\n"))).reverse()
+              : _.filter(_.map(lines, e=>{return e.trim().split(" ").filter(c=>{return c!==""})}), l=>{return l.length>0})
 }
 
 
@@ -301,6 +318,7 @@ function create_row(r, ridx) {
       n.id = `${ridx};${eidx}`
 
       if (e === BLOCKED) {n.style.backgroundColor="rgb(185, 185, 185)"}
+      if (e === SKIP) {n.style.backgroundColor="rgb(185, 185, 185)"}  // TODO: different color?
 
       var np = document.createElement("pre");
       np.innerHTML = np._innerHTML = e;
@@ -325,7 +343,8 @@ function draw_path(path, color, cycle) {
     }
 
     for ([n, r] of path) {
-      get_corresponding_div(n, r).style.backgroundColor = cycle ? get_next_color() : color;
+      var e = get_corresponding_div(n, r);
+      (e.children[0]._innerHTML !== "@D") && (e.style.backgroundColor = cycle ? get_next_color() : color);
     }
 }
 
@@ -352,7 +371,7 @@ function main() {
 
   cont = document.getElementById("tri_container");
 
-  pathsComputer = new Worker("/pascal_triangle/pascalesque/computer.js");
+  pathsComputer = new Worker("/pascal_triangle/pascalesque/computer.js?" + Math.random());
   pathsComputer.onmessage = m => {
     // console.log(m);
     switch (m.data.type) {
@@ -364,7 +383,7 @@ function main() {
       break;
 
       case "nextPath":
-      console.log(m);
+      // console.log(m);
       cselect = document.getElementById("colorcycle");
       draw_path(m.data.prevpath, "", false);
       draw_path(m.data.path, cselect.value === "nocycle" ? "rgba(65, 223, 208, 255)" : get_next_color(), cselect.value === "blocks");
