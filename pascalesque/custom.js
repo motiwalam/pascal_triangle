@@ -32,14 +32,6 @@ G G
 L L L
 E E E E`,
 
-pascal:
-`P
-A A
-S S S
-C C C C
-A A A
-L L`,
-
 mustafa:
 `M
 U U
@@ -63,8 +55,8 @@ A A
 V V V
 A A A A
 S S S S S
-C C C C C C
-R R R R R
+C C C C
+R R R
 I I I I
 P P P
 T T`,
@@ -74,23 +66,15 @@ mrkwan:
 R R
 . . .
 C C C C
-H H H H H
-I I I I I I
-T T T T T T T
-A A A A A A
-T T T T T
+H H H
+I I
+T
+A A
+T T T
 K K K K
 W W W
 A A
 N`,
-
-row_n:`$pascal ROW
-
-replace row above with row number then click Create to generate Pascal's triangle up to that row
-
-large (> ~30) row numbers can freeze your computer due to the huge number of paths
-
-create w/o paths to see just the triangle`,
 
 punctuation:`.
 \\ \\
@@ -116,6 +100,14 @@ M M M M
 E E E
 N N
 T`,
+
+pascal:`$pascal ROW
+
+replace "ROW" above with row number then click Create to generate Pascal's triangle up to that row
+
+BE CAREFUL: creating paths for row numbers >~22 can freeze your computer
+
+click 'Create w/o paths' to see just the triangle`,
 
 forbidden: `S
 1 1
@@ -229,12 +221,27 @@ async function create_arrangement(compute=true) {
 
 function center_arrangement() {
 
-  var rows = cont.children;
-  var longest_width = _.max(rows, (r)=>{return r.offsetWidth}).offsetWidth;
+  const rows = cont.children;
+  const longest_width = _.max(rows, (r)=>{return r.offsetWidth});
+
+  // horizontally offset each row if no horizontal overflow in container
+  var hoffset = 0;
+  if (longest_width.offsetWidth < cont.offsetWidth) {
+    hoffset = (cont.offsetWidth - longest_width.offsetWidth) / 2;
+  }
+
+  // vertically offset each row if no vertical overflow in container
+  var voffset = 0;
+  var theight = rows.length * (rows[0].offsetHeight);
+  if (theight < cont.offsetHeight) {
+    voffset = (cont.offsetHeight - theight) / 2 - 50;
+  }
 
   for (var r of rows) {
-    r.style.left = (longest_width - r.offsetWidth) / 2;
+    r.style.left = (longest_width.offsetWidth - r.offsetWidth) / 2 + hoffset;
+    r.style.top  = voffset;
   }
+
 
   cont.scrollLeft = cont.scrollLeftMax / 2;
 }
@@ -258,7 +265,7 @@ function test_can_animate() {
     } else if (!PATHS_READY) {
       b.style.width="auto";
       b.disabled = true;
-      b.innerHTML = "no paths available.."
+      b.innerHTML = "no paths.. did you click create w/ paths?"
     }
 
 }
@@ -320,16 +327,16 @@ function create_row(r, ridx) {
       if (e === BLOCKED) {n.style.backgroundColor="rgb(185, 185, 185)"}
       if (e === SKIP) {n.style.backgroundColor="rgb(185, 185, 185)"}  // TODO: different color?
 
+      var idx = document.createElement("span");
+      idx.className = "idx";
+      idx.innerHTML = n.id;
+
       var np = document.createElement("pre");
-      np.innerHTML = np._innerHTML = e;
-      np._pos = n.id;
+      np.innerHTML = `${e}`;
 
-      np.addEventListener("mouseover", (ev) =>
-          {var e = ev.originalTarget; e.innerHTML = `<span style="font-size: 8px;">(${e._pos})</span>${e._innerHTML}`;})
-
-      np.addEventListener("mouseout", (ev) => {var e = ev.originalTarget; e.innerHTML = e._innerHTML;})
-
+      n.appendChild(idx);
       n.appendChild(np);
+
       out.appendChild(n);
     }
 
@@ -344,7 +351,7 @@ function draw_path(path, color, cycle) {
 
     for ([n, r] of path) {
       var e = get_corresponding_div(n, r);
-      (e.children[0]._innerHTML !== "@D") && (e.style.backgroundColor = cycle ? get_next_color() : color);
+      (e.getElementsByTagName("pre")[0].innerHTML !== "@D") && (e.style.backgroundColor = cycle ? get_next_color() : color);
     }
 }
 
@@ -396,17 +403,20 @@ function main() {
   }
 
   choose_random_arrangement();
-  create_arrangement();
 
   aselect = document.getElementById("pre_options");
+
   for (k of _.keys(PREDEFINED_ARRANGEMENTS)) {
     var o = document.createElement("option");
     o.value = k;
     o.innerHTML = k.toUpperCase();
+    o.addEventListener('click', (e) => {
+      set_arrangement(PREDEFINED_ARRANGEMENTS[aselect.value]);
+      create_arrangement();
+    });
 
     aselect.appendChild(o);
   }
-  aselect.onchange = ()=>{set_arrangement(PREDEFINED_ARRANGEMENTS[aselect.value]); create_arrangement();}
 
   slider = document.getElementById("anim_speed");
   slider_label = document.getElementById("anim_speed_label");
