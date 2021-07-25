@@ -24,15 +24,21 @@ class Elem {
   }
 
   compute_paths(curpath) {
+    if (this.context.PATHS.length >= this.context.MAX_PATHS) {
+      postMessage({type: "tooManyPaths", max: this.context.MAX_PATHS, length: this.context.PATHS.length});
+      return;
+    }
+
     if (this.cell_value === this.context.BLOCKED) {
       return;
     }
 
     if (this.n == this.context.CURRENT_ARRANGEMENT.length-1) {
-      if (this.cell_value !== this.context.SKIP)
-        this.context.PATHS.push(new Path(curpath));
-      return;
-    }
+      if (this.cell_value !== this.context.SKIP) {
+          this.context.PATHS.push(new Path(curpath));
+        }
+        return;
+      }
 
     var cur_row_length = this.context.CURRENT_ARRANGEMENT[this.n].length;
     var next_row_length = this.context.CURRENT_ARRANGEMENT[this.n+1].length;

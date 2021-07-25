@@ -5,30 +5,31 @@
 div.triangle {
     overflow: auto;
     white-space: nowrap;
-    width: 70%;
+    width: 76%;
     height: 85%;
     margin: 0 auto;
     scrollbar-width: thin;
     position: absolute;
     top: 50%;
-    left: 50%;
-    transform: translate(-35%, -50%);
+    left: 23%;
+    transform: translateY(-50%);
     text-align: center;
 }
 
 div.row {
     position: relative;
-    height: 4.761904761904762%;
+    height: 4.75vh;
     text-align: center;
     z-index: -1;
     white-space: nowrap;
     display: flex;
     width: min-content;
+
 }
 
 div.elem {
     border: 1px solid #e1c2c2;
-    width: 80px;
+    width: 11vh;
     height: 80%;
     display: inline-block;
     position: relative;
@@ -47,17 +48,12 @@ div.elem pre {
 }
 
 div.elem pre:hover {
-    position: absolute;
     overflow: visible;
     background-color: rgb(217, 200, 200);
     width: min-content;
     height: min-content;
     z-index: 100;
     font-size: 150%;
-
-::-webkit-scrollbar-thumb {
-    border-radius: 3px;
-  }
 }
 
 button.mybutton {
@@ -70,7 +66,7 @@ button.mybutton {
 }
 
 button.binterface {
-  width: 125px;
+  width: 36%;
   border: hidden;
 }
 
@@ -78,18 +74,26 @@ button.binterface:hover {
   opacity: 75%;
 }
 
+button.binterface:active {
+  opacity: 85%;
+}
+
 select.mymenu {
   border: hidden;
-  width: 125px;
+  width: 36%;
 }
 
 select.mymenu:hover {
   opacity: 75%;
 }
 
+select.mymenu:active {
+  opacity: 85%;
+}
+
 div.interface {
   position: relative;
-  width: 350;
+  width: 100%;
   margin-top: 5px;
 }
 
@@ -104,6 +108,27 @@ div.intcontainer {
   position: absolute;
   top: 50%;
   transform: translate(0%, -60%);
+}
+
+span.hint {
+  visibility: hidden;
+  position: absolute;
+  background-color: #f4dada;
+  color: black;
+  text-align: center;
+  padding: 2px 6px;
+  border-radius: 6px;
+  bottom: 4px;
+  left: 3px;
+  float: none;
+}
+
+span.hint:hover {
+  opacity: 75%;
+}
+
+span.hint:active {
+  opacity: 85%;
 }
 
 span.idx {
@@ -151,4 +176,21 @@ span.pbc:hover {
   height: auto;
   z-index: 100;
   font-size: 110%;
+}
+
+input.lookup {
+  width: 50px;
+}
+
+div.output {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  text-overflow: ellipsis;
+  height: 30px;
+  white-space: nowrap;
+}
+
+div.output pre {
+  display: inline;
 }

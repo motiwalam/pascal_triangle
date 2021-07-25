@@ -5,57 +5,95 @@
     <link rel="stylesheet" href="/pascal_triangle/pascalesque/triangles.css"/>
     <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js"></script>
 
-    <script src="/pascal_triangle/pascalesque/custom.js"></script>
-    <script src="/pascal_triangle/pascalesque/path.js"></script>
+    <script src="/pascal_triangle/pascalesque/main.js"></script>
   </head>
 
-  <body onload="main();">
+  <body onresize="center_arrangement();">
 
-    <div><div class="triangle" id="tri_container"></div></div>
+    <div style="width: 22%">
 
-    <div class="interface">
-      Colour Cycle Mode: <select id="colorcycle">
-              <option disabled selected value="poop"> -- how to cycle -- </option>
-              <option value="nocycle">NO CYCLE</option>
-              <option value="paths">BETWEEN PATHS</option>
-              <option value="blocks">BETWEEN BLOCKS</option>
-            </select>
-    </div>
+      <div class="interface">
+        Colour Cycle Mode:&nbsp&nbsp <select id="colorcycle">
+                <option disabled selected value="poop"> -- how to cycle -- </option>
+                <option value="nocycle">NO CYCLE</option>
+                <option value="paths">BETWEEN PATHS</option>
+                <option value="blocks">BETWEEN BLOCKS</option>
+              </select>
+      </div>
 
-    <div class="interface">
-      Animation speed (ms):  <span id="anim_speed_label" style="width: 10px; display: inline-block;"></span>
-      <input type="range" id="anim_speed" min="10" max="2500" value=500 style="margin-left: 30px">
-    </div>
+      <div class="interface" style="margin-top: 10px">
+        Animation speed (ms):&nbsp&nbsp <input type="text" id="anim_speed" value=500 style="width: 60px; text-align: center">
+      </div>
+
+      <div class="interface">
+        Memory limit (Mb):&nbsp&nbsp <input id="m_input" type="text" style="width: 60px; text-align: center" value="1000">
+      </div>
 
 
-    <button style="width: 125;" type="submit" id="arr_button" class="mybutton" onclick="toggle_arrangement();">Hide</button>
-    <button style="width: 110;" type="submit" id="anim_button" class="mybutton" onmouseleave="_on_anim_button_mouseleave();" onmouseover="test_can_animate();" onclick="toggle_animate();">Animate</button>
+      <button style="width: 125;" type="submit" id="arr_button" class="mybutton">Hide</button>
+      <button style="width: 110;" type="submit" id="anim_button" class="mybutton">Animate</button>
 
-    <div class="interface" id="arr_container">
-        Total Paths: <pre style="display: inline;" id="pathscount"></pre>
-        <textarea style="width: 100%" id="arr_input" rows=20 cols=44 placeholder=
+      <div class="interface" id="arr_container">
+          Total Paths: <pre style="display: inline;" id="pathscount"></pre>
+          <div style="position: relative;">
+            <textarea style="width: 100%" id="arr_input" rows=20 cols=44 placeholder=
 "Enter one row per line.
 Row elements are space separated.
 @X denotes a forbidden block.
 @D denotes a skipped block (like in checkers).
 '$invert' as the first line will invert the following arrangement"
-        ></textarea>
+          >
+          </textarea>
+          <span class="hint" id="wait_hint">get text...</span>
+      </div>
+          <div class="intcontainer">
+            <button id="create_wpaths" class="binterface" style="background-color: rgba(39,234,28,255)" type="submit">
+              Create w/ paths
+            </button>
+            <button id="create_wopaths" class="binterface" style="background-color: rgba(5,219,199,255)" type="submit">
+              Create w/o paths
+            </button>
+          </div>
 
-        <div class="intcontainer">
-          <button class="binterface" style="background-color: rgba(39,234,28,255)" type="submit" onclick="create_arrangement();">Create w/ paths</button>
-          <button class="binterface" style="background-color: rgba(5,219,199,255)" type="submit" onclick="create_arrangement(false);">Create w/o paths</button>
+          <div class="intcontainer">
+          <button id="create_random" class="binterface" style="background-color: rgba(255,180,2,0.7)" type="submit">
+            Random
+          </button>
+
+          <select class="mymenu" style="background: rgba(206,147,255,255); background-color: rgba(206,147,255,255)" id="pre_options">
+            <option disabled selected value="poop"> -- examples -- </option>
+          </select>
         </div>
 
-        <div class="intcontainer">
-        <button class="binterface" style="background-color: rgba(255,180,2,0.7)" type="submit" onclick="choose_random_arrangement();">Random</button>
+        <br> </br>
 
-        <select class="mymenu" style="background: rgba(206,147,255,255); background-color: rgba(206,147,255,255)" id="pre_options">
-          <option disabled selected value="poop"> -- examples -- </option>
-        </select>
+        <h3 style="margin-bottom: 5px">Lookup</h3>
+
+        <div class="intcontainer" style="justify-content: start;">
+            <div style="margin-right: 25px">
+              <span> n: </span>
+              <input type="text" id="n_input" class="lookup">
+            </div>
+            <div>
+              <span> r: </span>
+              <input type="text" id="r_input" class="lookup">
+            </div>
+        </div>
+
+        <br></br>
+        <div class="output">
+          <b>Cell value:&nbsp&nbsp&nbsp</b><pre id="c_output"></pre>
+        </div>
+        <div class="output">
+          <b>Paths to cell:&nbsp&nbsp&nbsp</b><pre id="p_output"></pre>
+        </div>
+        </div>
+
       </div>
 
     </div>
 
+    <div class="triangle" id="tri_container"></div>
   </body>
 
 </html>
