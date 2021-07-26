@@ -269,7 +269,7 @@ function create_arrangement(compute=true, arrangement) {
           }
 
         }, 0);
-      }
+      });
 
     var pl = document.getElementById("pathscount");
 
