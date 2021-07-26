@@ -1,20 +1,24 @@
 # pascal_triangle
 
-Two Python scripts that can write and read individual rows of Pascal's triangle and a third that puts all of these into an actual triangle that can be viewed in a browser.
+This repository contains:
+* Two Python scripts that can write and read individual rows of Pascal's triangle and a third that puts all of these into an actual triangle that can be viewed in a browser.
+* the raw data for the first 500 rows of Pascal's triangle and multiple HTML documents for the triangle, up to a certain number of rows
+* a [website](https://thechosenreader.github.io/pascal_triangle/pascalesque/) to play with more generic Pascal-esque triangles
+
 
 ## Algorithm
 `rowpascal.py` generates the target row by relying on the fact that `nCr(n, r+1) / nCr(n, r) = (n-r)/(r+1)`. Previous versions of the algorithm also made use of the fact that each row is symmetrical but that was done away with in the interest of not blowing my computer up (larger rows take literal gigabytes of space).
 
-`pasc_latex.py` uses the recursive approach with a generator to create arbitrarily large triangles without a significant memory footprint. The code for it is not mine and comes from [here](https://www.bedroomlan.org/coding/pascals-triangle-latex/)
+`pasc_latex.py` implements the recursive approach with a generator to create arbitrarily large triangles. It performs on par with `gentriangle.py` The code for it is not mine and comes from [here](https://www.bedroomlan.org/coding/pascals-triangle-latex/).
+
+`pascalesque/computer.js` contains the javascript implementation used for the Pascal-esque website.
 
 ## File Format
-Speaking of space, I store each row in a custom file format which interleaves the raw bytes of each number in the row with 4 bytes that instruct the program on how many bytes to read the get the next number. It's not much but it cuts space consumption by about 2.5.
+Speaking of space, I store each row in a custom file format which interleaves the raw bytes of each number in the row with 4 bytes that instruct the program on how many bytes to read the get the next number. It's not much but it cuts space consumption by about 2.5, a necessity when computing large rows.
 
-## Speed
-It is Python so, it's obviously not very fast. It takes about 12 minutes to generate 10000 rows. Not to mention, reading large rows takes much longer. In the end, I chose Python for its support of arbitrarity large integers. I experimented using Java's BigInteger class which worked pretty well. I haven't implemented the `.rpas` format in Java yet, though. I also did some cursory research into BigInteger libraries for C++ but didn't find any convenient ones that worked well. In the end, Python won for its convenience.
 
 ## Triangles
-Below are links to all of the triangles available in this repository.
+Below are links to all of the triangles available in this repository. If you don't mind some javascript, I recommend you use the [Pascal-esque website](https://thechosenreader.github.io/pascal_triangle/pascalesque/) instead, as it can define triangles up to an arbitrary row. Type `$pascal ROW` into the input area to create a triangle with `ROW` rows.
 
 * [Row 12](https://thechosenreader.github.io/pascal_triangle/triangles/12.html)
 * [Row 50](https://thechosenreader.github.io/pascal_triangle/triangles/50.html)
@@ -29,7 +33,13 @@ Below are links to all of the triangles available in this repository.
 * [Row 500](https://thechosenreader.github.io/pascal_triangle/triangles/500.html)
 * [Row 1000](https://thechosenreader.github.io/pascal_triangle/triangles/1000.html)
 
-# Pascal-esque triangles
-These are triangles where the difference of two consecutive rows' lengths is -1 or 1. This enables both unambiguous diagonal traversal, the way one does in Pascal's triangle (this requires an odd difference), while also guaranteeing every block in the triangle is reachable. It also has the not at all coincidental side-effect of being very easy to traverse.
 
-Play around with Pascal-esque triangles [here](https://thechosenreader.github.io/pascal_triangle/pascalesque/)
+# Pascal-esque triangles
+Pascal's triangle is constructed recursively cell-by-cell where each cell contains the sum of the cells directly above it. In this way, each cell in Pascal's triangle actually contains the number of paths to it starting from the initial cell, if one can only move downwards.
+
+Pascal-esque, then, is my way of referring to any arrangement of consecutive rows that are traversed in this fashion, (i.e strictly downwards).
+
+`./pascalesque` contains the code for a website that allows a user to define any arrangement and computes the paths from top to bottom in that arrangement. It also uses the same algorithm above to create Pascal triangles up to a user defined row.
+
+
+Play around with Pascal-esque triangles [here](https://thechosenreader.github.io/pascal_triangle/pascalesque/).
