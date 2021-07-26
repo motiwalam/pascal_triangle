@@ -139,7 +139,9 @@ NUMPATHS = 0;
 
 PATHS_READY = false;
 TOO_MANY_PATHS = false;
+
 ANIMATION_INTERVAL_ID = -1;
+_TRI_ADDER_IDS = [];
 
 BLOCKED="@X";
 SKIP = "@D";
@@ -204,7 +206,7 @@ function set_arrangement(v) {
 }
 
 function create_arrangement(compute=true, arrangement) {
-    function _create_arrangement() {
+    async function _create_arrangement() {
       var WINDOW = 1250;
       var fragments = [];
 
@@ -224,14 +226,11 @@ function create_arrangement(compute=true, arrangement) {
       }
 
       fragments.push(cur_f);
-      fragments.longest_width = {
-        offsetWidth: _.max(CURRENT_ARRANGEMENT, e => e.length).length * 82
-      }
-      fragments.theight = CURRENT_ARRANGEMENT.length * (c.offsetHeight*0.0475);
       return fragments;
     }
+    _TRI_ADDER_IDS.forEach(i => clearTimeout(i));
+    _TRI_ADDER_IDS = [];
     _ADDING_TRIANGLE = false;
-
     /* this is super hacky ; i only use the arrangement parameter for pascal triangles
     which is also the only time #wait_hint should be visibile */
     arrangement || (document.getElementById("wait_hint").style.visibility = "hidden");
@@ -249,24 +248,28 @@ function create_arrangement(compute=true, arrangement) {
                           : arrangement;
 
     var c = document.getElementById("tri_container");
-    var fragments = _create_arrangement();
-    var idx = 0;
-    c.innerHTML = "";
-    _ADDING_TRIANGLE = true;
-    setTimeout(function add_fragments_onebyone() {
+
+    _create_arrangement()
+      .then(fragments => {
+        var idx = 0;
+        c.innerHTML = "";
+
+        _ADDING_TRIANGLE = true;
+        setTimeout(function add_fragments_onebyone() {
 
           if (idx < fragments.length && _ADDING_TRIANGLE) {
             c.appendChild(fragments[idx]);
             if (idx < 3)  // only center the first three fragments while adding - centering all of them looks weird
               center_arrangement();
             idx++;
-            setTimeout(add_fragments_onebyone, 100);
+            _TRI_ADDER_IDS.push(setTimeout(add_fragments_onebyone, 100));
           } else {
             center_arrangement();
             on_lookup_input_changed();
           }
 
-    }, 0);
+        }, 0);
+      }
 
     var pl = document.getElementById("pathscount");
 
@@ -455,7 +458,7 @@ function add_pascal_arrangement() {
 
     // create batches
     var s = _.chunk(
-                t.map(row => row.join(""))
+                t.map(row => row.join(" "))
                  .join("\n"),
                10000)
              .map(r => r.join(""));
