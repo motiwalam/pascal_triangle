@@ -2,19 +2,44 @@
   display: block;
   position: relative;
 }
+
+/* works on firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d3d3d3;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+/* *::-webkit-scrollbar-track {
+  background: white;
+} */
+
+*::-webkit-scrollbar-thumb {
+  background-color: #d3d3d3;
+  border-radius: 20px;
+}
+
 div.triangle {
     overflow: auto;
     white-space: nowrap;
     width: 76%;
     height: 85%;
     margin: 0 auto;
-    scrollbar-width: thin;
     position: absolute;
     top: 50%;
     left: 23%;
     transform: translateY(-50%);
     text-align: center;
 }
+
+div.triangle::-webkit-scrollbar {
+      width: thin;
+    }
 
 div.row {
     position: relative;
@@ -104,10 +129,19 @@ div.intcontainer {
   margin-top: 5px;
 }
 
-#anim_speed {
+#download_button {
   position: absolute;
-  top: 50%;
-  transform: translate(0%, -60%);
+  top: 7;
+  right: 7;
+}
+
+#download_button:hover {
+  opacity: 75%;
+  stroke: #164ed5;
+}
+
+#download_button:active {
+  opacity: 95%;
 }
 
 span.hint {
@@ -185,7 +219,6 @@ input.lookup {
 div.output {
   width: 100%;
   overflow-x: auto;
-  scrollbar-width: thin;
   text-overflow: ellipsis;
   height: 30px;
   white-space: nowrap;

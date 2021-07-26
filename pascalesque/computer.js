@@ -5,6 +5,8 @@ MEMSIZE_ELEM = 25;  // bytes
 
 PREVIDX = CURIDX = 0;
 
+_PREVIOUS_OBJECT_URL = "";
+
 importScripts("https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js");
 importScripts("/pascal_triangle/pascalesque/path.js?" + Math.random());
 
@@ -39,18 +41,40 @@ function compute_paths(memlimit, current_arrangement, blocked, skip) {
 
 function pascal(n) {
 
-    function rowpascal(_n) {
-      var out = [1].concat(Array(_n));
+    function rowpascal(row_n) {
+      var out = [1].concat(Array(row_n));
 
-      ndiv2 = Math.floor(_n/2);
+      ndiv2 = Math.floor(row_n/2);
       var rcoeff = BigInt(1);
 
-      _.map( _.range(1, _n+1), (i) => {out[i] = (i > ndiv2 ? out[_n - i] : (rcoeff = (rcoeff * BigInt(_n-i+1))/BigInt(i) ))} )
+      _.range(1, row_n+1)
+       .forEach(i => {
+         out[i] = (i > ndiv2)
+                    ? out[row_n -i]
+                    : rcoeff = (rcoeff * BigInt(row_n-i+1))/BigInt(i)
+       })
 
       return out;
     }
 
-    return _.map(_.range(n), (j)=>{return rowpascal(j)});
+    return _.range(n)
+            .map(j => rowpascal(j))
+}
+
+function save_arrangement(arrangement) {
+  var data = new Blob(
+    [arrangement.map(row => row.join(" ")).join("\n")],
+    {type: "text/plain"}
+  );
+
+  // never keep more than one url active at a time, definitely
+  // smarter ways to do this but oh well
+  if (_PREVIOUS_OBJECT_URL !== null) {
+    self.URL.revokeObjectURL(_PREVIOUS_OBJECT_URL);
+  }
+
+  _PREVIOUS_OBJECT_URL = self.URL.createObjectURL(data);
+  return _PREVIOUS_OBJECT_URL;
 }
 
 onmessage = function (m) {
@@ -83,5 +107,12 @@ onmessage = function (m) {
       doreverse: doReverse,
     });
     break;
+
+    case "createDownloadURL":
+    var url = save_arrangement(m.data.current_arrangement);
+    postMessage({
+      type: "urlCreated",
+      url : url,
+    })
   }
 }

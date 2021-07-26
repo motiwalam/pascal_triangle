@@ -32,6 +32,32 @@ G G
 L L L
 E E E E`,
 
+pascal:`$pascal ROW
+
+replace "ROW" above with row number then click Create to generate Pascal's triangle up to that row
+`,
+
+forbidden: `S
+1 1
+1 2 1
+1 3 3 1
+1 4 @X 4 @X
+@X 5 4 4 4 @X
+@X 5 9 8 8 @X @X`,
+
+skip: `A
+B B
+C C C
+D @D @D D
+E E E E E
+@D F F @D
+G G @D G G
+H H H H H H`,
+
+invert:`#$invert
+$pascal 15
+delete the hashtag and click create to see what happens`,
+
 mustafa:
 `M
 U U
@@ -55,11 +81,11 @@ A A
 V V V
 A A A A
 S S S S S
-C C C C
-R R R
-I I I I
-P P P
-T T`,
+C C C C C
+R R R R
+I I I
+P P
+T`,
 
 mrkwan:
 `M
@@ -101,31 +127,6 @@ E E E
 N N
 T`,
 
-pascal:`$pascal ROW
-
-replace "ROW" above with row number then click Create to generate Pascal's triangle up to that row
-`,
-
-forbidden: `S
-1 1
-1 2 1
-1 3 3 1
-1 4 @X 4 @X
-@X 5 4 4 4 @X
-@X 5 9 8 8 @X @X`,
-
-skip: `A
-B B
-C C C
-D @D @D D
-E E E E E
-@D F F @D
-G G @D G G
-H H H H H H`,
-
-invert:`#$invert
-$pascal 15
-delete the hashtag and click create to see what happens`,
 custom: ''
 }
 
@@ -155,20 +156,25 @@ _ADDING_TRIANGLE = false;
 _PASCAL_ARRANGEMENT = [];  // lolll really committing to the global variable approach eh
 
 function _on_anim_button_mouseleave() {
+    console.log("mouseleave")
     var b = document.getElementById("anim_button");
     b.innerHTML = ANIMATION_INTERVAL_ID === -1 ? "Animate" : "Stop Animating";
     b.disabled = false;
+    b.style.opacity = "100%";
     b.style.width = 110;
 }
 
 function toggle_animate() {
-  if (ANIMATION_INTERVAL_ID === -1) {
-    ANIMATION_INTERVAL_ID = setInterval(draw_next_path, slider.value);
-    document.getElementById("anim_button").innerHTML = "Stop Animating";
-  } else {
-    clearInterval(ANIMATION_INTERVAL_ID);
-    ANIMATION_INTERVAL_ID = -1;
-    document.getElementById("anim_button").innerHTML = "Animate";
+  if (PATHS_READY) {
+    if (ANIMATION_INTERVAL_ID === -1) {
+      ANIMATION_INTERVAL_ID = setInterval(draw_next_path, slider.value);
+      document.getElementById("anim_button").innerHTML = "Stop Animating";
+    } else {
+      clearInterval(ANIMATION_INTERVAL_ID);
+      ANIMATION_INTERVAL_ID = -1;
+      document.getElementById("anim_button").innerHTML = "Animate";
+    }
+
   }
 }
 
@@ -184,7 +190,9 @@ function toggle_arrangement() {
 
 function choose_random_arrangement() {
   var i = document.getElementById("arr_input");
-  var notcurrents = _.filter(_.values(PREDEFINED_ARRANGEMENTS), s=>{return s!==i.value && s!== "";})
+  var notcurrents = _.values(PREDEFINED_ARRANGEMENTS)
+                     .filter(s => s!==i.value && s!== "")
+
   var idx = parseInt(Math.random() * (notcurrents.length));
   set_arrangement(notcurrents[idx]);
   create_arrangement();
@@ -249,7 +257,7 @@ function create_arrangement(compute=true, arrangement) {
 
           if (idx < fragments.length && _ADDING_TRIANGLE) {
             c.appendChild(fragments[idx]);
-            if (idx <= 2)  // only center the first three fragments - centering all of them looks weird
+            if (idx < 3)  // only center the first three fragments while adding - centering all of them looks weird
               center_arrangement();
             idx++;
             setTimeout(add_fragments_onebyone, 100);
@@ -264,8 +272,8 @@ function create_arrangement(compute=true, arrangement) {
 
     PATHS_READY = false;
     TOO_MANY_PATHS = false;
-    if (compute) {
-      if (row_length_differences_are_1(CURRENT_ARRANGEMENT)) {
+    // sooo many hacks i swear this is DISGUSTING
+    if (compute && !(CURRENT_ARRANGEMENT.slice(0, 3).join(' ')=="computing pascal row")) {
         pl.innerHTML="computing...";
         computer.postMessage({
           type: "computePaths",
@@ -274,9 +282,6 @@ function create_arrangement(compute=true, arrangement) {
           skip: SKIP,
           memlimit: get_memlimit()
         });
-      } else {
-        pl.innerHTML = "? (arrangement is not Pascal-esque; row lengths must differ by 1)"
-      }
     } else {
       pl.innerHTML="not computing..";
     }
@@ -303,15 +308,15 @@ function center_arrangement() {
       r.style.top  = voffset;
     }
 
-    cont.scrollLeft = cont.scrollLeftMax / 2;
+    cont.scrollLeft = (cont.scrollWidth - cont.offsetWidth) / 2;
 
   }
 }
 
-function row_length_differences_are_1(tri) {
+function row_length_differences_are_odd(tri) {
   for ([r1, r2] of _.zip(tri, tri.slice(1))) {
     if (r2 !== undefined) {
-      if (Math.abs(r2.length - r1.length) !== 1) { return false; }
+      if (Math.abs(r2.length - r1.length) %2 !== 1) { return false; }
     }
   }
 
@@ -320,13 +325,11 @@ function row_length_differences_are_1(tri) {
 
 function test_can_animate() {
     var b = document.getElementById("anim_button");
-    if (!row_length_differences_are_1(CURRENT_ARRANGEMENT)) {
+
+    if (!PATHS_READY) {
       b.style.width="auto";
-      b.disabled = true;
-      b.innerHTML = "Invalid Pascal-esque triangle. Row differences are not 1.";
-    } else if (!PATHS_READY) {
-      b.style.width="auto";
-      b.disabled = true;
+      // b.disabled = true;
+      b.style.opacity = "50%";
       b.innerHTML = "no paths.. did you click create w/ paths?"
     }
 
@@ -342,7 +345,7 @@ function parseInput(s, opts) {
   var lines = s.split("\n");
   if (s.startsWith("$pascal ")) {
     try {
-      var n = parseInt(_.filter(s.split(" "), c=>{return c!== ""})[1]);
+      var n = parseInt(s.split(" ").filter(c => c!== "")[1]);
       if (!isNaN(n)) {
         computer.postMessage({
           type: "computePascal",
@@ -358,7 +361,12 @@ function parseInput(s, opts) {
   }
   return lines[0].trim() === "$invert"
               ? (parseInput(lines.slice(1).join("\n"), _.extend(opts, {doInvert: true}))).reverse()
-              : _.filter(_.map(lines, e=>{return e.trim().split(" ").filter(c=>{return c!==""})}), l=>{return l.length>0})
+              : lines
+                  .map( e => e
+                              .trim()
+                              .split(" ")
+                              .filter(c => c!=="") )
+                  .filter(l => l.length>0)
 }
 
 
@@ -408,7 +416,11 @@ function draw_path(path, color, cycle) {
 
     for ([n, r] of path) {
       var e = get_corresponding_div(n, r);
-      (e.getElementsByTagName("pre")[0].innerHTML !== "@D") && (e.style.backgroundColor = cycle ? get_next_color() : color);
+      if (e.cell_value === SKIP) {
+          e.style.opacity = (color === "") ? "" : "50%";
+      } else {
+        e.style.backgroundColor = cycle ? get_next_color() : color;
+      }
     }
 }
 
@@ -420,48 +432,34 @@ function draw_next_path() {
 function add_per_block_counts(pbc) {
   for (var row of cont.children) {
     for (var e of row.children) {
-      var id = e.id;
+      var paths   = _.has(pbc, e.id) ? pbc[e.id] : 0;
+      e.numpaths = paths;
+
+      if (paths === 0 && !(e.cell_value === BLOCKED || e.cell_value === SKIP)) {
+        e.style.backgroundColor = "rgb(225, 220, 220)"
+      }
 
       var c = document.createElement("span");
       c.className = "pbc";
-      var paths   = _.has(pbc, id) ? pbc[id] : 0;
       c.innerHTML = paths;
 
-      e.numpaths = paths;
       e.appendChild(c);
+
     }
   }
 }
 
 function add_pascal_arrangement() {
-  var wh = document.getElementById("wait_hint");
-  wh.innerHTML = "adding..";
-
-  if (!_ADDING_ARR_INPUT) {
+  function add(t) {
     _ADDING_ARR_INPUT = true;
-    var t = _PASCAL_ARRANGEMENT
 
     // create batches
-    var s = [];
-    var cur_s = "";
-    var count = 0;
-    for (var r of t) {
-      for (var e of r) {
-        var temp = e + " ";
-        cur_s += temp;
-        count += temp.length;
-        if (count >= 10000) {
-          s.push(cur_s);
-          count = 0;
-          cur_s = "";
-        }
-      }
-      cur_s += "\n";
-      count++;
-    }
-    s.push(cur_s);
+    var s = _.chunk(
+                t.map(row => row.join(""))
+                 .join("\n"),
+               10000)
+             .map(r => r.join(""));
 
-    t = null;
     // add batches
     var i = document.getElementById("arr_input");
     i.value = "";
@@ -477,6 +475,37 @@ function add_pascal_arrangement() {
         _PASCAL_ARRANGEMENT = [];
       }
     }, 0);
+
+  }
+
+  var wh = document.getElementById("wait_hint");
+
+  if (!_ADDING_ARR_INPUT) {
+    var tri = _PASCAL_ARRANGEMENT
+
+    if (tri.length > 150) {
+      Swal.fire({
+        title: "Are you sure?",
+        text:  "These can get really big and possibly slow down your computer",
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: "Continue",
+        denyButtonText: "Download (recommended)",
+        cancelButtonText: "Abort",
+      }).then(result => {
+        if (result.isDenied || result.isDismissed) {
+          if (result.isDenied) {
+            post_download();
+          }
+          return;
+        } else {
+          add();
+        }
+      })
+    } else {
+      wh.innerHTML = "adding..";
+      add(tri);
+    }
 
   }
 
@@ -506,20 +535,42 @@ function on_lookup_input_changed() {
 
 }
 
+function post_download() {
+  computer.postMessage( {
+    type: "createDownloadURL",
+    current_arrangement: CURRENT_ARRANGEMENT,
+  });
+}
+
+function download_arrangement(url, suggested) {
+  var link = document.createElement("a");
+  link.setAttribute("download", suggested ?? "arrangement");
+  link.href = url;
+
+  document.body.appendChild(link);
+
+  window.requestAnimationFrame(()=>{
+    var e = new MouseEvent("click");
+    link.dispatchEvent(e);
+    document.body.removeChild(link);
+  })
+}
+
 function main() {
 
-  document.getElementById("anim_button").addEventListener("mouseleave", _on_anim_button_mouseleave);
+  document.getElementById("anim_button").addEventListener("mouseout", _on_anim_button_mouseleave);
   document.getElementById("anim_button").addEventListener("mouseover", test_can_animate);
 
   document.getElementById("anim_button").addEventListener("click", toggle_animate);
   document.getElementById("arr_button").addEventListener("click", toggle_arrangement);
-  document.getElementById("create_wpaths").addEventListener("click", () => {create_arrangement(true)});
-  document.getElementById("create_wopaths").addEventListener("click", () => {create_arrangement(false)});
+  document.getElementById("create_wpaths").addEventListener("click", () => create_arrangement(true));
+  document.getElementById("create_wopaths").addEventListener("click", () => create_arrangement(false));
   document.getElementById("create_random").addEventListener("click", choose_random_arrangement);
   document.getElementById("wait_hint").addEventListener("click", add_pascal_arrangement);
+  document.getElementById("download_button").addEventListener("click", post_download)
 
-  document.getElementById("n_input").addEventListener("change", on_lookup_input_changed);
-  document.getElementById("r_input").addEventListener("change", on_lookup_input_changed);
+  document.getElementById("n_input").addEventListener("input", on_lookup_input_changed);
+  document.getElementById("r_input").addEventListener("input", on_lookup_input_changed);
 
   cont = document.getElementById("tri_container");
 
@@ -566,6 +617,11 @@ function main() {
       wh.style.visibility = "visible";
       break;
 
+      case "urlCreated":
+      console.log(m.data.url);
+      download_arrangement(m.data.url, m.data.suggested);
+      break;
+
       case "test":
       console.log(m);
       break;
@@ -580,16 +636,20 @@ function main() {
     var o = document.createElement("option");
     o.value = k;
     o.innerHTML = k.toUpperCase();
-    o.addEventListener('click', function (e) {
-      set_arrangement(PREDEFINED_ARRANGEMENTS[aselect.value]);
-      create_arrangement();
-    });
 
     aselect.appendChild(o);
   }
 
+  aselect.addEventListener('change', () => {
+    set_arrangement(PREDEFINED_ARRANGEMENTS[aselect.value]);
+    create_arrangement();
+    aselect.selectedIndex = 0;
+  })
+
+
   slider = document.getElementById("anim_speed");
   slider.onchange = () => {toggle_animate(); toggle_animate()}
+
 }
 
 window.addEventListener("load", main);

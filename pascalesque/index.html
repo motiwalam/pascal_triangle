@@ -4,6 +4,7 @@
     <title>Pascal-esque Triangles</title>
     <link rel="stylesheet" href="/pascal_triangle/pascalesque/triangles.css"/>
     <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="/pascal_triangle/pascalesque/main.js"></script>
   </head>
@@ -32,11 +33,10 @@
 
       <button style="width: 125;" type="submit" id="arr_button" class="mybutton">Hide</button>
       <button style="width: 110;" type="submit" id="anim_button" class="mybutton">Animate</button>
-
       <div class="interface" id="arr_container">
           Total Paths: <pre style="display: inline;" id="pathscount"></pre>
           <div style="position: relative;">
-            <textarea style="width: 100%" id="arr_input" rows=20 cols=44 placeholder=
+            <textarea style="width: 100%; scrollbar-width: thin;" id="arr_input" rows=20 cols=44 placeholder=
 "Enter one row per line.
 Row elements are space separated.
 @X denotes a forbidden block.
@@ -45,6 +45,12 @@ Row elements are space separated.
           >
           </textarea>
           <span class="hint" id="wait_hint">get text...</span>
+          <svg id="download_button" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-download" width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+            <polyline points="7 11 12 16 17 11" />
+            <line x1="12" y1="4" x2="12" y2="16" />
+          </svg>
       </div>
           <div class="intcontainer">
             <button id="create_wpaths" class="binterface" style="background-color: rgba(39,234,28,255)" type="submit">
