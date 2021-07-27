@@ -196,7 +196,7 @@ function _on_anim_button_mouseleave() {
 function toggle_animate() {
   if (PATHS_READY) {
     if (ANIMATION_INTERVAL_ID === -1) {
-      var speed = parseInt(document.getElementById("anim_speed"));
+      var speed = parseInt(document.getElementById("anim_speed").value);
       speed = isNaN(speed) ? 500 : speed;
       ANIMATION_INTERVAL_ID = setInterval(draw_next_path, speed);
       document.getElementById("anim_button").innerHTML = "Stop Animating";
