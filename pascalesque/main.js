@@ -1,3 +1,6 @@
+BLOCKED="@X";
+SKIP = "@S";
+
 PREDEFINED_ARRANGEMENTS = {
 patterns:
 `P
@@ -41,17 +44,17 @@ forbidden: `S
 1 1
 1 2 1
 1 3 3 1
-1 4 @X 4 @X
-@X 5 4 4 4 @X
-@X 5 9 8 8 @X @X`,
+1 4 ${BLOCKED} 4 ${BLOCKED}
+${BLOCKED} 5 4 4 4 ${BLOCKED}
+${BLOCKED} 5 9 8 8 ${BLOCKED} ${BLOCKED}`,
 
 skip: `A
 B B
 C C C
-D @D @D D
+D ${SKIP} ${SKIP} D
 E E E E E
-@D F F @D
-G G @D G G
+${SKIP} F F ${SKIP}
+G G ${SKIP} G G
 H H H H H H`,
 
 invert:`#$invert
@@ -155,7 +158,7 @@ emoji:[[9729],
  .join("\n"),
 
 custom: ''
-}
+};
 
 //              lavender              maize               greeen                topaz
 COLORS = [ [214, 179, 243, 255], [249, 202, 72, 255], [148, 210, 145, 255], [65, 223, 208, 255] ];
@@ -170,8 +173,6 @@ TOO_MANY_PATHS = false;
 ANIMATION_INTERVAL_ID = -1;
 _TRI_ADDER_IDS = [];
 
-BLOCKED="@X";
-SKIP = "@D";
 
 /*
 if set_arrangement() is called while the setTimeout sequence for adding
@@ -268,8 +269,9 @@ function create_arrangement(compute=true, arrangement) {
       toggle_animate()
     }
 
+    var input = document.getElementById("arr_input").value;
     CURRENT_ARRANGEMENT = (arrangement === undefined)
-                          ? parseInput(document.getElementById("arr_input").value,
+                          ? parseInput(input,
                             {
                               doInvert: false,
                               doCompute: compute
@@ -305,7 +307,7 @@ function create_arrangement(compute=true, arrangement) {
     PATHS_READY = false;
     TOO_MANY_PATHS = false;
     // sooo many hacks i swear this is DISGUSTING
-    if (compute && !(CURRENT_ARRANGEMENT.slice(0, 3).join(' ')=="computing pascal row")) {
+    if (compute && !(document.getElementById("arr_input").value.startsWith("computing pascal row"))) {
         pl.innerHTML="computing...";
         computer.postMessage({
           type: "computePaths",
@@ -631,6 +633,13 @@ function main() {
     aselect.appendChild(o);
   }
 
+  document.getElementById("arr_input").setAttribute("placeholder",
+`Enter one row per line.
+Row elements are space separated.
+${BLOCKED} denotes a forbidden block.
+${SKIP} denotes a skipped block (like in checkers).
+'$invert' as the first line will invert the following arrangement`)
+
   cont = document.getElementById("tri_container");
 
   // handle message from computer
@@ -668,6 +677,7 @@ function main() {
       }
 
       TOO_MANY_PATHS = true;
+      PATHS_READY = false;
       break;
 
       case "pascalComputed":
