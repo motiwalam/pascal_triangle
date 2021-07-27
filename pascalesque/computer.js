@@ -120,6 +120,7 @@ addEventListener('message', m => {
     postMessage({
       type: "urlCreated",
       url : url,
+      suggested: m.data.suggested,
     })
   }
 })

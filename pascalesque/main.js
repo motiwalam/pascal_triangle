@@ -526,7 +526,7 @@ function add_pascal_arrangement() {
       }).then(result => {
         if (result.isDenied || result.isDismissed) {
           if (result.isDenied) {
-            post_download();
+            post_download(`pascal${tri.length}.txt`);
           }
           return;
         } else {
@@ -566,16 +566,18 @@ function on_lookup_input_changed() {
 
 }
 
-function post_download() {
+function post_download(suggested) {
+  // console.log(suggested);
   computer.postMessage( {
     type: "createDownloadURL",
     current_arrangement: CURRENT_ARRANGEMENT,
+    suggested: suggested ?? "arrangement.txt",
   });
 }
 
 function download_arrangement(url, suggested) {
   var link = document.createElement("a");
-  link.setAttribute("download", suggested ?? "arrangement");
+  link.setAttribute("download", suggested ?? "arrangement.txt");
   link.href = url;
 
   document.body.appendChild(link);
@@ -605,7 +607,7 @@ function main() {
   document.getElementById("create_wopaths").addEventListener("click", () => create_arrangement(false));
   document.getElementById("create_random").addEventListener("click", choose_random_arrangement);
   document.getElementById("wait_hint").addEventListener("click", add_pascal_arrangement);
-  document.getElementById("download_button").addEventListener("click", post_download)
+  document.getElementById("download_button").addEventListener("click", e => post_download())
 
   document.getElementById("n_input").addEventListener("input", on_lookup_input_changed);
   document.getElementById("r_input").addEventListener("input", on_lookup_input_changed);
