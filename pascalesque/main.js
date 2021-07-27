@@ -615,7 +615,7 @@ function download_arrangement(url, suggested) {
 
 function restart_computer() {
   computer.terminate();
-  computer = new Worker('/pascal_triangle/pascalesque/computer.js?' + Math.random());
+  computer = new Worker('/pascal_triangle/pascalesque/computer.js');
   computer.addEventListener('message', computer_message_f);
 }
 
@@ -672,7 +672,7 @@ ${SKIP} denotes a skipped block (see examples->SKIP).
   cont = document.getElementById("tri_container");
 
   // handle message from computer
-  computer = new Worker("/pascal_triangle/pascalesque/computer.js?" + Math.random());
+  computer = new Worker("/pascal_triangle/pascalesque/computer.js");
   computer_message_f = m => {
     // console.log(m);
     switch (m.data.type) {
@@ -732,7 +732,7 @@ ${SKIP} denotes a skipped block (see examples->SKIP).
   }
   computer.addEventListener('message', computer_message_f);
 
-  downloader = new Worker('/pascal_triangle/pascalesque/downloader.js?' + Math.random());
+  downloader = new Worker('/pascal_triangle/pascalesque/downloader.js');
   downloader.addEventListener('message', m => {
     switch (m.data.type) {
       case "urlCreated":

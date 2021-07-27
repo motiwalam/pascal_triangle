@@ -6,7 +6,7 @@ MEMSIZE_ELEM = 25;  // bytes
 PREVIDX = CURIDX = 0;
 
 importScripts("https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js");
-importScripts("/pascal_triangle/pascalesque/path.js?" + Math.random());
+importScripts("/pascal_triangle/pascalesque/path.js");
 
 function compute_paths(opts) {
     _PATHS = [];
