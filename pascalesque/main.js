@@ -634,11 +634,15 @@ function main() {
   }
 
   document.getElementById("arr_input").setAttribute("placeholder",
-`Enter one row per line.
-Row elements are space separated.
-${BLOCKED} denotes a forbidden block.
-${SKIP} denotes a skipped block (like in checkers).
-'$invert' as the first line will invert the following arrangement`)
+`Enter one row per line. Row elements are space separated.
+
+${BLOCKED} denotes a forbidden block (see examples->FORBIDDEN).
+
+${SKIP} denotes a skipped block (see examples->SKIP).
+
+'$pascal ROW' can be used to create pascal triangles (see examples->PASCAL).
+
+'$invert' as the first line will invert the following arrangement (see examples->INVERT).`)
 
   cont = document.getElementById("tri_container");
 
@@ -703,7 +707,7 @@ ${SKIP} denotes a skipped block (like in checkers).
   })
 
   // start off with a random arrangement
-  choose_random_arrangement();
+  // choose_random_arrangement();
 
 }
 
