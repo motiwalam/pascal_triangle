@@ -27,7 +27,16 @@
       </div>
 
       <div class="interface">
-        Memory limit (Mb):&nbsp&nbsp <input id="m_input" type="text" style="width: 60px; text-align: center" value="1000">
+        Memory limit (MB):&nbsp&nbsp <input id="m_input" type="text" style="width: 60px; text-align: center" value="1000">
+      </div>
+
+      <div class="interface">
+        Compute every <input type="text" id="nthpath_input" value=1 style="width: 60px; text-align: center"> path(s)
+      </div>
+
+      <div class="interface">
+        <span class="tooltip" style="border-bottom: 1px dotted black;">Trim paths by sieve<span class="tooltiptext">When the size of the computed paths exceed the memory limit, the default behaviour is to simply stop storing them. Check this box to instead reduce the size of the paths by half by filtering them out in a sieve-like fashion.</span></span> <input type="checkbox" id="do_trim_input">
+
       </div>
 
 

@@ -5,26 +5,26 @@ MEMSIZE_ELEM = 25;  // bytes
 
 PREVIDX = CURIDX = 0;
 
-_PREVIOUS_OBJECT_URL = "";
-
 importScripts("https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js");
 importScripts("/pascal_triangle/pascalesque/path.js?" + Math.random());
 
-function compute_paths(memlimit, current_arrangement, blocked, skip) {
+function compute_paths(opts) {
     _PATHS = [];
-    var _PER_BLOCK_COUNT = {};
 
     var c = {
-      CURRENT_ARRANGEMENT: current_arrangement,
+      CURRENT_ARRANGEMENT: opts.current_arrangement,
       PATHS: _PATHS,
-      PER_BLOCK_COUNT: _PER_BLOCK_COUNT,
-      BLOCKED: blocked,
-      SKIP: skip,
-      MAX_PATHS: (memlimit / MEMSIZE_ELEM) / (current_arrangement.length)
+      PER_BLOCK_COUNT: {},
+      BLOCKED: opts.blocked,
+      SKIP: opts.skip,
+      MAX_PATHS: (opts.memlimit / MEMSIZE_ELEM) / (opts.current_arrangement.length),
+      PATH_COUNT: 0,
+      EVERYNTHPATH: opts.everynthpath,
+      DO_TRIM: opts.dotrim,
     };
 
-    if (current_arrangement.length > 0) {
-      for (i of _.range(current_arrangement[0].length)) {
+    if (opts.current_arrangement.length > 0) {
+      for (i of _.range(opts.current_arrangement[0].length)) {
         var start = new Elem(0, i, "right", c);
         start.compute_paths([start]);
       }
@@ -32,9 +32,11 @@ function compute_paths(memlimit, current_arrangement, blocked, skip) {
       PREVIDX = CURIDX = 0;
       postMessage({
         type: "pathsComputed",
-        numpaths: _PATHS.length,
-        pbc: _PER_BLOCK_COUNT
+        numpaths: c.PATH_COUNT,
+        pbc: c.PER_BLOCK_COUNT
       });
+
+      _PATHS = c.PATHS;
 
     }
 }
@@ -61,43 +63,31 @@ function pascal(n) {
             .map(j => rowpascal(j))
 }
 
-function save_arrangement(arrangement) {
-  var data = new Blob(
-    [arrangement.map(row => row.join(" ")).join("\n")],
-    {type: "text/plain"}
-  );
-
-  // never keep more than one url active at a time, definitely
-  // smarter ways to do this but oh well
-  if (_PREVIOUS_OBJECT_URL !== null) {
-    self.URL.revokeObjectURL(_PREVIOUS_OBJECT_URL);
-  }
-
-  _PREVIOUS_OBJECT_URL = self.URL.createObjectURL(data);
-  return _PREVIOUS_OBJECT_URL;
-}
 
 addEventListener('message', m => {
   switch (m.data.type) {
     case "computePaths":
-    compute_paths(m.data.memlimit, m.data.current_arrangement, m.data.blocked, m.data.skip);
+    compute_paths({
+      memlimit: m.data.memlimit,
+      current_arrangement: m.data.current_arrangement,
+      blocked: m.data.blocked,
+      skip: m.data.skip,
+      everynthpath: m.data.everynthpath,
+      dotrim: m.data.dotrim,
+    });
     break;
 
     case "getNextPath":
-    postMessage({
-      type: "nextPath",
-      prevpath: _PATHS[PREVIDX].simplify(),
-      path: _PATHS[CURIDX].simplify()
-    });
-    PREVIDX = CURIDX;
-    CURIDX = (CURIDX + 1) % _PATHS.length;
-    break;
+    if (_PATHS.length > 0) {
+      postMessage({
+        type: "nextPath",
+        prevpath: _PATHS[PREVIDX].simplify(),
+        path: _PATHS[CURIDX].simplify()
+      });
+      PREVIDX = CURIDX;
+      CURIDX = (CURIDX + 1) % _PATHS.length;
 
-    case "getAllPaths":  // this can be dangerous and purely for debugging purposes
-    postMessage({
-      type: "allPaths",
-      paths: _PATHS.map(simplify)
-    })
+    }
     break;
 
     case "destroyPaths":
@@ -115,12 +105,5 @@ addEventListener('message', m => {
     });
     break;
 
-    case "createDownloadURL":
-    var url = save_arrangement(m.data.current_arrangement);
-    postMessage({
-      type: "urlCreated",
-      url : url,
-      suggested: m.data.suggested,
-    })
   }
 })

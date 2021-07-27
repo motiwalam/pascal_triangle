@@ -9,8 +9,15 @@ class Elem {
 
   compute_paths(curpath) {
     // return if too many paths (i.e too much memory consumption)
-    if (this.context.PATHS.length >= this.context.MAX_PATHS) {
-      postMessage({type: "tooManyPaths", max: this.context.MAX_PATHS, length: this.context.PATHS.length});
+    if (this.context.PATHS.length >= this.context.MAX_PATHS
+        && this.context.DO_TRIM) {
+      // if (!this.context.DO_TRIM)
+      //   postMessage({type: "tooManyPaths", max: this.context.MAX_PATHS, length: this.context.PATHS.length});
+      // else {
+      //   this.halve_paths();
+      // }
+      this.halve_paths();
+      this.compute_paths(curpath);
       return;
     }
 
@@ -37,7 +44,11 @@ class Elem {
     // return if cell is the end of path
     if (this.n == this.context.CURRENT_ARRANGEMENT.length-1) {
       if (this.cell_value !== this.context.SKIP) {
-          this.context.PATHS.push(new Path(curpath));
+          if (this.context.PATH_COUNT % this.context.EVERYNTHPATH == 0
+              && this.context.PATH_COUNT < this.context.MAX_PATHS) {
+            this.context.PATHS.push(new Path(curpath));
+          }
+          this.context.PATH_COUNT++;
         }
         return;
       }
@@ -77,8 +88,10 @@ class Elem {
     return `${this.n};${this.r}`
   }
 
-  countself() {
-
+  halve_paths() {
+    this.context.PATHS = _.pairs(this.context.PATHS)
+                          .filter( ([i, v]) => i%2==0 )
+                          .map( ([i, v]) => v);
   }
 
 }

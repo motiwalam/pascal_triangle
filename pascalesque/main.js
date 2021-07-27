@@ -168,6 +168,7 @@ CURRENT_ARRANGEMENT = [];
 NUMPATHS = 0;
 
 PATHS_READY = false;
+PATHS_COMPUTING = false;
 TOO_MANY_PATHS = false;
 
 ANIMATION_INTERVAL_ID = -1;
@@ -186,7 +187,7 @@ _ADDING_TRIANGLE = false;
 _PASCAL_ARRANGEMENT = [];  // lolll really committing to the global variable approach eh
 
 function _on_anim_button_mouseleave() {
-    console.log("mouseleave")
+    // console.log("mouseleave")
     var b = document.getElementById("anim_button");
     b.innerHTML = ANIMATION_INTERVAL_ID === -1 ? "Animate" : "Stop Animating";
     b.disabled = false;
@@ -197,8 +198,7 @@ function _on_anim_button_mouseleave() {
 function toggle_animate() {
   if (PATHS_READY) {
     if (ANIMATION_INTERVAL_ID === -1) {
-      var speed = parseInt(document.getElementById("anim_speed").value);
-      speed = isNaN(speed) ? 500 : speed;
+      var speed = get_animspeed();
       ANIMATION_INTERVAL_ID = setInterval(draw_next_path, speed);
       document.getElementById("anim_button").innerHTML = "Stop Animating";
     } else {
@@ -208,6 +208,7 @@ function toggle_animate() {
     }
 
   }
+
 }
 
 
@@ -227,7 +228,7 @@ function choose_random_arrangement() {
 
   var idx = parseInt(Math.random() * (notcurrents.length));
   set_arrangement(notcurrents[idx]);
-  create_arrangement();
+  create_arrangement(true);
 }
 
 function set_arrangement(v) {
@@ -235,7 +236,7 @@ function set_arrangement(v) {
   document.getElementById("arr_input").value = v === undefined ? "" : v;
 }
 
-function create_arrangement(compute=true, arrangement) {
+function create_arrangement(compute, arrangement) {
     async function _create_arrangement() {
       var WINDOW = 1250;
       var fragments = [];
@@ -304,20 +305,25 @@ function create_arrangement(compute=true, arrangement) {
 
     var pl = document.getElementById("pathscount");
 
-    PATHS_READY = false;
     TOO_MANY_PATHS = false;
+    PATHS_READY = false;
     // sooo many hacks i swear this is DISGUSTING
-    if (compute && !(document.getElementById("arr_input").value.startsWith("computing pascal row"))) {
+    if (compute) {
         pl.innerHTML="computing...";
-        computer.postMessage({
-          type: "computePaths",
-          current_arrangement: CURRENT_ARRANGEMENT,
-          blocked: BLOCKED,
-          skip: SKIP,
-          memlimit: get_memlimit()
-        });
-    } else {
-      pl.innerHTML="not computing..";
+
+        if (CURRENT_ARRANGEMENT[0].slice(0, 3).join(" ") != "computing pascal row") {
+
+          PATHS_COMPUTING = true;
+          computer.postMessage({
+            type: "computePaths",
+            current_arrangement: CURRENT_ARRANGEMENT,
+            blocked: BLOCKED,
+            skip: SKIP,
+            memlimit: get_memlimit(),
+            everynthpath: get_everynthpath(),
+            dotrim: get_dotrim(),
+          });
+        }
     }
 
 }
@@ -364,14 +370,30 @@ function test_can_animate() {
       b.style.width="auto";
       // b.disabled = true;
       b.style.opacity = "50%";
-      b.innerHTML = "no paths.. did you click create w/ paths?"
+      b.innerHTML = "paths not ready";
     }
 
 }
 
+function get_int_value_by_id(id, defaultv, process) {
+  var v = parseInt(document.getElementById(id).value);
+  return isNaN(v) ? defaultv : (process ?? _.identity)(v);
+}
+
 function get_memlimit() {
-  var m_limit = parseInt(document.getElementById("m_input").value);
-  return isNaN(m_limit) ? 1e+9 : m_limit * (1e+6);
+  return get_int_value_by_id("m_input", 1e+9, v => v*1e+6, );
+}
+
+function get_everynthpath() {
+  return get_int_value_by_id("nthpath_input", 1);
+}
+
+function get_animspeed() {
+  return get_int_value_by_id("anim_speed", 500);
+}
+
+function get_dotrim() {
+  return document.getElementById("do_trim_input").checked;
 }
 
 function parseInput(s, opts) {
@@ -570,7 +592,7 @@ function on_lookup_input_changed() {
 
 function post_download(suggested) {
   // console.log(suggested);
-  computer.postMessage( {
+  downloader.postMessage( {
     type: "createDownloadURL",
     current_arrangement: CURRENT_ARRANGEMENT,
     suggested: suggested ?? "arrangement.txt",
@@ -591,10 +613,10 @@ function download_arrangement(url, suggested) {
   })
 }
 
-function __get_all_paths() {
-  computer.postMessage({
-    type: "getAllPaths",
-  })
+function restart_computer() {
+  computer.terminate();
+  computer = new Worker('/pascal_triangle/pascalesque/computer.js?' + Math.random());
+  computer.addEventListener('message', computer_message_f);
 }
 
 function main() {
@@ -605,7 +627,10 @@ function main() {
 
   document.getElementById("anim_button").addEventListener("click", toggle_animate);
   document.getElementById("arr_button").addEventListener("click", toggle_arrangement);
-  document.getElementById("create_wpaths").addEventListener("click", () => create_arrangement(true));
+  document.getElementById("create_wpaths").addEventListener("click", () => _.wrap(create_arrangement, f => {
+    restart_computer();
+    f(true);
+  })());
   document.getElementById("create_wopaths").addEventListener("click", () => create_arrangement(false));
   document.getElementById("create_random").addEventListener("click", choose_random_arrangement);
   document.getElementById("wait_hint").addEventListener("click", add_pascal_arrangement);
@@ -621,7 +646,7 @@ function main() {
   aselect = document.getElementById("pre_options");
   aselect.addEventListener('change', () => {
     set_arrangement(PREDEFINED_ARRANGEMENTS[aselect.value]);
-    create_arrangement();
+    create_arrangement(true);
     aselect.selectedIndex = 0;
   })
 
@@ -640,7 +665,7 @@ ${BLOCKED} denotes a forbidden block (see examples->FORBIDDEN).
 
 ${SKIP} denotes a skipped block (see examples->SKIP).
 
-'$pascal ROW' can be used to create pascal triangles (see examples->PASCAL).
+'$pascal ROW' can be used to create Pascal triangles (see examples->PASCAL).
 
 '$invert' as the first line will invert the following arrangement (see examples->INVERT).`)
 
@@ -648,16 +673,25 @@ ${SKIP} denotes a skipped block (see examples->SKIP).
 
   // handle message from computer
   computer = new Worker("/pascal_triangle/pascalesque/computer.js?" + Math.random());
-  computer.addEventListener('message', m => {
+  computer_message_f = m => {
     // console.log(m);
     switch (m.data.type) {
       case "pathsComputed":
       NUMPATHS = m.data.numpaths;
       if (!TOO_MANY_PATHS) {
+        PATHS_COMPUTING = false;
         PATHS_READY = true;
         document.getElementById("pathscount").innerHTML=NUMPATHS;
-        add_per_block_counts(m.data.pbc);
-        on_lookup_input_changed();
+
+        _.wrap(() => {
+          add_per_block_counts(m.data.pbc);
+          on_lookup_input_changed();
+        }, function c(f) {
+          if (cont.children.length == CURRENT_ARRANGEMENT.length)
+            f()
+          else
+            setTimeout(c, 10, f);
+        })();
       }
       break;
 
@@ -666,10 +700,6 @@ ${SKIP} denotes a skipped block (see examples->SKIP).
       cselect = document.getElementById("colorcycle");
       draw_path(m.data.prevpath, "", false);
       draw_path(m.data.path, cselect.value === "nocycle" ? "rgba(65, 223, 208, 255)" : get_next_color(), cselect.value === "blocks");
-      break;
-
-      case "allPaths":
-      console.log(m.data.paths);
       break;
 
       case "tooManyPaths":
@@ -695,14 +725,21 @@ ${SKIP} denotes a skipped block (see examples->SKIP).
       wh.style.visibility = "visible";
       break;
 
+      case "test":
+      console.log(m);
+      break;
+    }
+  }
+  computer.addEventListener('message', computer_message_f);
+
+  downloader = new Worker('/pascal_triangle/pascalesque/downloader.js?' + Math.random());
+  downloader.addEventListener('message', m => {
+    switch (m.data.type) {
       case "urlCreated":
       console.log(m.data.url);
       download_arrangement(m.data.url, m.data.suggested);
       break;
 
-      case "test":
-      console.log(m);
-      break;
     }
   })
 
