@@ -77,7 +77,7 @@ function save_arrangement(arrangement) {
   return _PREVIOUS_OBJECT_URL;
 }
 
-onmessage = function (m) {
+addEventListener('message', m => {
   switch (m.data.type) {
     case "computePaths":
     compute_paths(m.data.memlimit, m.data.current_arrangement, m.data.blocked, m.data.skip);
@@ -91,6 +91,13 @@ onmessage = function (m) {
     });
     PREVIDX = CURIDX;
     CURIDX = (CURIDX + 1) % _PATHS.length;
+    break;
+
+    case "getAllPaths":  // this can be dangerous and purely for debugging purposes
+    postMessage({
+      type: "allPaths",
+      paths: _PATHS.map(simplify)
+    })
     break;
 
     case "destroyPaths":
@@ -115,4 +122,4 @@ onmessage = function (m) {
       url : url,
     })
   }
-}
+})

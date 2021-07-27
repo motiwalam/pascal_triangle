@@ -127,6 +127,33 @@ E E E
 N N
 T`,
 
+
+emoji:[[9729],
+ [128330, 128330],
+ [128140, 128140, 128140],
+ [128139, 128139, 128139, 128139],
+ [127851, 127851, 127851],
+ [128059, 128059, 128059],
+ [127810, 127810, 127810, 127810],
+ [127803, 127803, 127803, 127803, 127803, ],
+ [127855, 127855, 127855, 127855],
+ [128157, 128157],
+ [127800,127800,127800],
+ [128152,128152,128152,128152],
+ [128142,128142,128142,128142,128142],
+ [127758,127758,127758,127758],
+ [128032,128032,128032,128032,128032],
+ [127811,127811,127811,127811,127811,127811],
+ [129361,129361,129361,129361,129361],
+ [128012,128012,128012,128012],
+ [129344,129344],
+ [127873,127873,127873],
+ [128081,128081],
+ [127853]]
+ .map(r => r.map(c => String.fromCodePoint(c))
+            .join(" "))
+ .join("\n"),
+
 custom: ''
 }
 
@@ -459,8 +486,7 @@ function add_pascal_arrangement() {
     // create batches
     var s = _.chunk(
                 t.map(row => row.join(" "))
-                 .join("\n"),
-               10000)
+                 .join("\n"), 10000)
              .map(r => r.join(""));
 
     // add batches
@@ -502,7 +528,7 @@ function add_pascal_arrangement() {
           }
           return;
         } else {
-          add();
+          add(tri);
         }
       })
     } else {
@@ -559,8 +585,15 @@ function download_arrangement(url, suggested) {
   })
 }
 
+function __get_all_paths() {
+  computer.postMessage({
+    type: "getAllPaths",
+  })
+}
+
 function main() {
 
+  // add all event listeners
   document.getElementById("anim_button").addEventListener("mouseout", _on_anim_button_mouseleave);
   document.getElementById("anim_button").addEventListener("mouseover", test_can_animate);
 
@@ -574,11 +607,31 @@ function main() {
 
   document.getElementById("n_input").addEventListener("input", on_lookup_input_changed);
   document.getElementById("r_input").addEventListener("input", on_lookup_input_changed);
+  document.getElementById("anim_speed").addEventListener("input", () => {
+    toggle_animate();
+    toggle_animate();
+  });
+
+  aselect = document.getElementById("pre_options");
+  aselect.addEventListener('change', () => {
+    set_arrangement(PREDEFINED_ARRANGEMENTS[aselect.value]);
+    create_arrangement();
+    aselect.selectedIndex = 0;
+  })
+
+  for (k of _.keys(PREDEFINED_ARRANGEMENTS)) {
+    var o = document.createElement("option");
+    o.value = k;
+    o.innerHTML = k.toUpperCase();
+
+    aselect.appendChild(o);
+  }
 
   cont = document.getElementById("tri_container");
 
+  // handle message from computer
   computer = new Worker("/pascal_triangle/pascalesque/computer.js?" + Math.random());
-  computer.onmessage = m => {
+  computer.addEventListener('message', m => {
     // console.log(m);
     switch (m.data.type) {
       case "pathsComputed":
@@ -596,6 +649,10 @@ function main() {
       cselect = document.getElementById("colorcycle");
       draw_path(m.data.prevpath, "", false);
       draw_path(m.data.path, cselect.value === "nocycle" ? "rgba(65, 223, 208, 255)" : get_next_color(), cselect.value === "blocks");
+      break;
+
+      case "allPaths":
+      console.log(m.data.paths);
       break;
 
       case "tooManyPaths":
@@ -629,29 +686,10 @@ function main() {
       console.log(m);
       break;
     }
-  }
-
-  choose_random_arrangement();
-
-  aselect = document.getElementById("pre_options");
-
-  for (k of _.keys(PREDEFINED_ARRANGEMENTS)) {
-    var o = document.createElement("option");
-    o.value = k;
-    o.innerHTML = k.toUpperCase();
-
-    aselect.appendChild(o);
-  }
-
-  aselect.addEventListener('change', () => {
-    set_arrangement(PREDEFINED_ARRANGEMENTS[aselect.value]);
-    create_arrangement();
-    aselect.selectedIndex = 0;
   })
 
-
-  slider = document.getElementById("anim_speed");
-  slider.onchange = () => {toggle_animate(); toggle_animate()}
+  // start off with a random arrangement
+  choose_random_arrangement();
 
 }
 
