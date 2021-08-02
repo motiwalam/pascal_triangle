@@ -16,7 +16,7 @@ def pascal(n):
         raise ValueError ('n must be an integer >= 0')
 
     def newrow(row):
-        "Calculate a row of Pascal's triangle given the previous one."
+        """Calculate a row of Pascal's triangle given the previous one."""
         out = []
         prev = 0
         for x in row:
