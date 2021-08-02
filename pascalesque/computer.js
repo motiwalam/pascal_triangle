@@ -1,9 +1,10 @@
-_CURRENT_ARRANGEMENT = [];
-_PATHS = [];
+var _CURRENT_ARRANGEMENT = [];
+var _PATHS = [];
 
-MEMSIZE_ELEM = 25;  // bytes
+var MEMSIZE_ELEM = 25;  // bytes
 
-PREVIDX = CURIDX = 0;
+var PREVIDX = 0,
+    CURIDX = 0;
 
 importScripts("https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js");
 importScripts("/pascal_triangle/pascalesque/path.js");
@@ -24,7 +25,7 @@ function compute_paths(opts) {
     };
 
     if (opts.current_arrangement.length > 0) {
-      for (i of _.range(opts.current_arrangement[0].length)) {
+      for (var i of _.range(opts.current_arrangement[0].length)) {
         var start = new Elem(0, i, "right", c);
         start.compute_paths([start]);
       }
@@ -41,30 +42,8 @@ function compute_paths(opts) {
     }
 }
 
-function pascal(n) {
 
-    function rowpascal(row_n) {
-      var out = [1].concat(Array(row_n));
-
-      ndiv2 = Math.floor(row_n/2);
-      var rcoeff = BigInt(1);
-
-      _.range(1, row_n+1)
-       .forEach(i => {
-         out[i] = (i > ndiv2)
-                    ? out[row_n -i]
-                    : rcoeff = (rcoeff * BigInt(row_n-i+1))/BigInt(i)
-       })
-
-      return out;
-    }
-
-    return _.range(n)
-            .map(j => rowpascal(j))
-}
-
-
-addEventListener('message', m => {
+self.addEventListener('message', m => {
   switch (m.data.type) {
     case "computePaths":
     compute_paths({
@@ -92,17 +71,6 @@ addEventListener('message', m => {
 
     case "destroyPaths":
     _PATHS = null;
-    break;
-
-    case "computePascal":
-    var doReverse = m.data.doreverse;
-    var t = pascal(m.data.row);
-    postMessage({
-      type: "pascalComputed",
-      tri: doReverse ? t.reverse() : t,
-      docompute: m.data.docompute,
-      doreverse: doReverse,
-    });
     break;
 
   }

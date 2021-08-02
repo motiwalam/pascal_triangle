@@ -1,7 +1,178 @@
-BLOCKED="@X";
-SKIP = "@S";
+var BLOCKED="@X";
+var SKIP = "@S";
 
-PREDEFINED_ARRANGEMENTS = {
+var HELPTEXT = {
+  SHADERS:
+`Define a function that will take a DOM object '<b>cell</b>' as input and will return a valid CSS color.
+
+The 'cell' object will also have two fields: '<b>numpaths</b>' and '<b>cell_value</b>' which indicate the number of paths to the cell and the actual contents of the cell respectively.`,
+
+  COMMANDS:
+`Define a function that will take two arguments,'<b>argv</b>', and '<b>lines</b>'.
+
+Any line that starts with $CMDNAME is split on the spaces and passed as '<b>argv</b>'.
+
+Every line that occurs after the line starting with $CMDNAME is passed as '<b>lines</b>'.
+
+The function must return an array that represents the parsed state for the rest of the lines.
+
+In most cases, you will not want to parse the rest of the input yourself. 'parseInput(lines.join('\\n'))' will parse the rest of the lines.
+
+You will get to choose CMDNAME when you click 'Create Command'`
+
+}
+var CSS_COLOR_NAMES = [
+  "AliceBlue",
+  "AntiqueWhite",
+  "Aqua",
+  "Aquamarine",
+  "Azure",
+  "Beige",
+  "Bisque",
+  "Black",
+  "BlanchedAlmond",
+  "Blue",
+  "BlueViolet",
+  "Brown",
+  "BurlyWood",
+  "CadetBlue",
+  "Chartreuse",
+  "Chocolate",
+  "Coral",
+  "CornflowerBlue",
+  "Cornsilk",
+  "Crimson",
+  "Cyan",
+  "DarkBlue",
+  "DarkCyan",
+  "DarkGoldenRod",
+  "DarkGray",
+  "DarkGrey",
+  "DarkGreen",
+  "DarkKhaki",
+  "DarkMagenta",
+  "DarkOliveGreen",
+  "DarkOrange",
+  "DarkOrchid",
+  "DarkRed",
+  "DarkSalmon",
+  "DarkSeaGreen",
+  "DarkSlateBlue",
+  "DarkSlateGray",
+  "DarkSlateGrey",
+  "DarkTurquoise",
+  "DarkViolet",
+  "DeepPink",
+  "DeepSkyBlue",
+  "DimGray",
+  "DimGrey",
+  "DodgerBlue",
+  "FireBrick",
+  "FloralWhite",
+  "ForestGreen",
+  "Fuchsia",
+  "Gainsboro",
+  "GhostWhite",
+  "Gold",
+  "GoldenRod",
+  "Gray",
+  "Grey",
+  "Green",
+  "GreenYellow",
+  "HoneyDew",
+  "HotPink",
+  "IndianRed",
+  "Indigo",
+  "Ivory",
+  "Khaki",
+  "Lavender",
+  "LavenderBlush",
+  "LawnGreen",
+  "LemonChiffon",
+  "LightBlue",
+  "LightCoral",
+  "LightCyan",
+  "LightGoldenRodYellow",
+  "LightGray",
+  "LightGrey",
+  "LightGreen",
+  "LightPink",
+  "LightSalmon",
+  "LightSeaGreen",
+  "LightSkyBlue",
+  "LightSlateGray",
+  "LightSlateGrey",
+  "LightSteelBlue",
+  "LightYellow",
+  "Lime",
+  "LimeGreen",
+  "Linen",
+  "Magenta",
+  "Maroon",
+  "MediumAquaMarine",
+  "MediumBlue",
+  "MediumOrchid",
+  "MediumPurple",
+  "MediumSeaGreen",
+  "MediumSlateBlue",
+  "MediumSpringGreen",
+  "MediumTurquoise",
+  "MediumVioletRed",
+  "MidnightBlue",
+  "MintCream",
+  "MistyRose",
+  "Moccasin",
+  "NavajoWhite",
+  "Navy",
+  "OldLace",
+  "Olive",
+  "OliveDrab",
+  "Orange",
+  "OrangeRed",
+  "Orchid",
+  "PaleGoldenRod",
+  "PaleGreen",
+  "PaleTurquoise",
+  "PaleVioletRed",
+  "PapayaWhip",
+  "PeachPuff",
+  "Peru",
+  "Pink",
+  "Plum",
+  "PowderBlue",
+  "Purple",
+  "RebeccaPurple",
+  "Red",
+  "RosyBrown",
+  "RoyalBlue",
+  "SaddleBrown",
+  "Salmon",
+  "SandyBrown",
+  "SeaGreen",
+  "SeaShell",
+  "Sienna",
+  "Silver",
+  "SkyBlue",
+  "SlateBlue",
+  "SlateGray",
+  "SlateGrey",
+  "Snow",
+  "SpringGreen",
+  "SteelBlue",
+  "Tan",
+  "Teal",
+  "Thistle",
+  "Tomato",
+  "Turquoise",
+  "Violet",
+  "Wheat",
+  "White",
+  "WhiteSmoke",
+  "Yellow",
+  "YellowGreen",
+];
+
+var PREDEFINED_ARRANGEMENTS = {
 patterns:
 `P
 A A
@@ -37,7 +208,7 @@ E E E E`,
 
 pascal:`$pascal ROW
 
-replace "ROW" above with row number then click Create to generate Pascal's triangle up to that row
+[#] replace "ROW" above with row number then click Create to generate Pascal's triangle up to that row
 `,
 
 forbidden: `S
@@ -57,9 +228,10 @@ ${SKIP} F F ${SKIP}
 G G ${SKIP} G G
 H H H H H H`,
 
-invert:`#$invert
+invert:`[#] $invert
 $pascal 15
-delete the hashtag and click create to see what happens`,
+
+[#] delete the '[#]' on the first line and click create to see what happens`,
 
 mustafa:
 `M
@@ -89,21 +261,6 @@ R R R R
 I I I
 P P
 T`,
-
-mrkwan:
-`M
-R R
-. . .
-C C C C
-H H H
-I I
-T
-A A
-T T T
-K K K K
-W W W
-A A
-N`,
 
 punctuation:`.
 \\ \\
@@ -159,20 +316,109 @@ emoji:[[9729],
 
 custom: ''
 };
+var PREDEFINED_SHADERS = {
+even_odd:
+`return cell.numpaths%2==0 ? 'red' : 'blue'`,
+
+even_odd_pascal:
+`return BigInt(cell.cell_value)%BigInt(2)==0 ? 'red' : 'blue'`,
+
+modn:
+`let n=3;
+let chunk = Math.floor(CSS_COLOR_NAMES.length/n);
+return CSS_COLOR_NAMES[(cell.numpaths%n)*chunk]`,
+
+modn_pascal:
+`let n=3;
+let chunk = BigInt(Math.floor(CSS_COLOR_NAMES.length/n));
+
+let bigint_n = BigInt(n);
+return CSS_COLOR_NAMES[(BigInt(cell.cell_value)%bigint_n)*chunk]`,
+
+random:
+`return CSS_COLOR_NAMES[Math.floor(Math.random()*CSS_COLOR_NAMES.length)]`,
+
+rgbcmyk:
+`var map = {
+  R: 'red',
+  G: 'green',
+  B: 'blue',
+  C: 'cyan',
+  M: 'magenta',
+  Y: 'yellow',
+  K: 'black',
+};
+
+var v = cell.cell_value.toUpperCase();
+return map.hasOwnProperty(v) ? map[v] : "";`
+
+};
+var PREDEFINED_COMMANDS = {
+invert:
+`// this is the actual code used in parser.js
+return parseInput(lines.join('\\n')).reverse()
+`,
+
+pascalian:
+`// this is the actual code used in parser.js
+var n = parseInt(argv[1]);
+if (!isNaN(n)&&n>=0) {
+  var seq = argv.slice(2);
+  var offidx = 0;
+  seq = seq.length > 0 ? seq : parseInput(lines[offidx++]).filter(r=>r.length>0)[0];
+  return pascalian(n, seq).concat(parseInput(lines.slice(offidx).join("\\n")));
+}
+else
+  return parseInput(lines.join("\\n"));`,
+
+pascalianI_custom:
+`// much like pascalianI, except you define how two terms are added
+
+function add(a, b) {
+  /* define addition here */
+}
+
+argv = argv.slice(1);
+var offidx = 0;
+var seq = argv.length > 0 ? argv : parseInput(lines[offidx++]).filter(r=>r.length>0)[0].map(e=>e.toString());
+
+return pascalianI_w_custom_adder(seq, add).concat(parseInput(lines.slice(offidx).join("\n")));`,
+
+rgb_pascal:
+`/*
+This reduces a sequence containing 'R', 'B', and 'Y' according to the rules
+defined in this Mathologer video https://www.youtube.com/watch?v=9JN5f7_3YmQ
+
+Best used along with the RGBCMYK shader.
+Not error tolerant.
+*/
+
+var universe = ["R", "B", "Y"]
+var seq = argv.map(e=>e.toUpperCase()).filter(e => universe.includes(e));
+
+return pascalianI_w_custom_adder(seq, (a, b) => a==b ? a : universe.filter(e => ![a, b].includes(e))[0])
+       .concat(parseInput(lines.join("\\n")));`,
+
+};
+var SAVED_FUNCTIONS = _.object(_.keys(window.localStorage).map(k => [k, window.localStorage.getItem(k)]));
 
 //              lavender              maize               greeen                topaz
-COLORS = [ [214, 179, 243, 255], [249, 202, 72, 255], [148, 210, 145, 255], [65, 223, 208, 255] ];
-COLORIDX = 0;
+var COLORS = [ [214, 179, 243, 255], [249, 202, 72, 255], [148, 210, 145, 255], [65, 223, 208, 255] ];
+var COLORIDX = 0;
 
-CURRENT_ARRANGEMENT = [];
-NUMPATHS = 0;
+var CURRENT_ARRANGEMENT = [];
+var NUMPATHS = 0;
 
-PATHS_READY = false;
-PATHS_COMPUTING = false;
-TOO_MANY_PATHS = false;
+var PATHS_READY = false,
+    PATHS_COMPUTING = false,
+    TOO_MANY_PATHS = false,
+    IS_SHADING = false,
+    IS_SHADED = false,
+    IS_SWITCHING = false,
+    IS_ZOOMED = false;
 
-ANIMATION_INTERVAL_ID = -1;
-_TRI_ADDER_IDS = [];
+var ANIMATION_INTERVAL_ID = -1;
+var _TRI_ADDER_IDS = [];
 
 
 /*
@@ -181,10 +427,10 @@ the pascal triangle to the arrangement input, then _ADDING_ARR_INPUT will change
 back to false
 likewise for _ADDING_TRIANGLE while setTimeout sequence for arrangements is ongoing
 */
-_ADDING_ARR_INPUT = false;
-_ADDING_TRIANGLE = false;
+var _ADDING_ARR_INPUT = false;
+var _ADDING_TRIANGLE = false;
 
-_PASCAL_ARRANGEMENT = [];  // lolll really committing to the global variable approach eh
+var _PASCAL_ARRANGEMENT = [];  // lolll really committing to the global variable approach eh
 
 function _on_anim_button_mouseleave() {
     // console.log("mouseleave")
@@ -211,8 +457,7 @@ function toggle_animate() {
 
 }
 
-
-function toggle_arrangement() {
+function toggle_arrangement_input_visibility() {
   var b = document.getElementById("arr_button");
   var c = document.getElementById("arr_container");
   var isShowing = Boolean(c.hidden);
@@ -228,7 +473,7 @@ function choose_random_arrangement() {
 
   var idx = parseInt(Math.random() * (notcurrents.length));
   set_arrangement(notcurrents[idx]);
-  create_arrangement(true);
+  postinput_with_restart(true);
 }
 
 function set_arrangement(v) {
@@ -262,22 +507,12 @@ function create_arrangement(compute, arrangement) {
     _TRI_ADDER_IDS.forEach(i => clearTimeout(i));
     _TRI_ADDER_IDS = [];
     _ADDING_TRIANGLE = false;
-    /* this is super hacky ; i only use the arrangement parameter for pascal triangles
-    which is also the only time #wait_hint should be visibile */
-    arrangement || (document.getElementById("wait_hint").style.visibility = "hidden");
 
     if (ANIMATION_INTERVAL_ID !== -1) {
       toggle_animate()
     }
 
-    var input = document.getElementById("arr_input").value;
-    CURRENT_ARRANGEMENT = (arrangement === undefined)
-                          ? parseInput(input,
-                            {
-                              doInvert: false,
-                              doCompute: compute
-                            })
-                          : arrangement;
+    CURRENT_ARRANGEMENT = arrangement;
 
     var c = document.getElementById("tri_container");
 
@@ -311,19 +546,17 @@ function create_arrangement(compute, arrangement) {
     if (compute) {
         pl.innerHTML="computing...";
 
-        if (CURRENT_ARRANGEMENT[0].slice(0, 3).join(" ") != "computing pascal row") {
+        PATHS_COMPUTING = true;
+        computer.postMessage({
+          type: "computePaths",
+          current_arrangement: CURRENT_ARRANGEMENT,
+          blocked: BLOCKED,
+          skip: SKIP,
+          memlimit: get_memlimit(),
+          everynthpath: get_everynthpath(),
+          dotrim: get_dotrim(),
+        });
 
-          PATHS_COMPUTING = true;
-          computer.postMessage({
-            type: "computePaths",
-            current_arrangement: CURRENT_ARRANGEMENT,
-            blocked: BLOCKED,
-            skip: SKIP,
-            memlimit: get_memlimit(),
-            everynthpath: get_everynthpath(),
-            dotrim: get_dotrim(),
-          });
-        }
     }
 
 }
@@ -334,7 +567,7 @@ function center_arrangement() {
   const rows = cont.children;
 
   if (rows.length > 0) {
-    const longest_width = _.max(rows, (r)=>{return r.offsetWidth});
+    const longest_width = _.max(rows, r => r.offsetWidth);
 
     // horizontally offset each row if no horizontal overflow in container
     const hoffset = (cont.scrollWidth - longest_width.offsetWidth) / 2;
@@ -344,8 +577,8 @@ function center_arrangement() {
     const voffset = theight > cont.offsetHeight ? 0 : (cont.offsetHeight - theight) /2;
 
     for (var r of rows) {
-      r.style.left = (longest_width.offsetWidth - (r.offsetWidth)) / 2 + hoffset;
-      r.style.top  = voffset;
+      r.style.left = `${(longest_width.offsetWidth - (r.offsetWidth)) / 2 + hoffset}px`;
+      r.style.top  = `${voffset}px`;
     }
 
     cont.scrollLeft = (cont.scrollWidth - cont.offsetWidth) / 2;
@@ -354,7 +587,7 @@ function center_arrangement() {
 }
 
 function row_length_differences_are_odd(tri) {
-  for ([r1, r2] of _.zip(tri, tri.slice(1))) {
+  for (var [r1, r2] of _.zip(tri, tri.slice(1))) {
     if (r2 !== undefined) {
       if (Math.abs(r2.length - r1.length) %2 !== 1) { return false; }
     }
@@ -396,35 +629,9 @@ function get_dotrim() {
   return document.getElementById("do_trim_input").checked;
 }
 
-function parseInput(s, opts) {
-  s = s.trim();
-  var lines = s.split("\n");
-  if (s.startsWith("$pascal ")) {
-    try {
-      var n = parseInt(s.split(" ").filter(c => c!== "")[1]);
-      if (!isNaN(n)) {
-        computer.postMessage({
-          type: "computePascal",
-          row: n,
-          doreverse: opts.doInvert,
-          docompute: opts.doCompute
-        });
-        set_arrangement(`computing pascal row ${n}`)
-        return parseInput(`computing pascal row ${n}`);
-      }
-    } catch (e) {console.log("exception in parseInput"); console.log(e)}
-    return parseInput("pascal row");
-  }
-  return lines[0].trim() === "$invert"
-              ? (parseInput(lines.slice(1).join("\n"), _.extend(opts, {doInvert: true}))).reverse()
-              : lines
-                  .map( e => e
-                              .trim()
-                              .split(" ")
-                              .filter(c => c!=="") )
-                  .filter(l => l.length>0)
+function get_switchpbc() {
+  return document.getElementById("switch_pbc_input").checked;
 }
-
 
 function get_next_color() {
   var [r, g, b, a] = COLORS[COLORIDX];
@@ -440,7 +647,10 @@ function create_row(r, ridx) {
       var e = r[eidx].toString();
       var n = document.createElement("div");
       n.className = "elem";
+      n.n = ridx;
+      n.r = eidx;
       n.id = `${ridx};${eidx}`
+      n.prevcolor = "";
 
       n.cell_value = e;
       n.numpaths = "N/A";
@@ -453,10 +663,15 @@ function create_row(r, ridx) {
       idx.innerHTML = n.id;
 
       var np = document.createElement("pre");
+      np.className = "cvalue";
       np.innerHTML = `${e}`;
+
+      var pbc = document.createElement("span");
+      pbc.className = "pbc";
 
       n.appendChild(idx);
       n.appendChild(np);
+      n.appendChild(pbc);
 
       out.appendChild(n);
     }
@@ -464,28 +679,32 @@ function create_row(r, ridx) {
     return out;
 }
 
-
 function draw_path(path, color, cycle) {
     function get_corresponding_div(n, r) {
       return document.getElementById(`${n};${r}`);
     }
 
-    for ([n, r] of path) {
+    for (var [n, r] of path) {
       var e = get_corresponding_div(n, r);
       if (e.cell_value === SKIP) {
-          e.style.opacity = (color === "") ? "" : "50%";
+          e.style.opacity = (color === "") ? e.prevcolor : "50%";
       } else {
-        e.style.backgroundColor = cycle ? get_next_color() : color;
+        if (color === "")
+          e.style.backgroundColor = e.prevcolor;
+        else
+          e.style.backgroundColor = cycle ? get_next_color() : color;
+
+        // e.prevcolor = e.style.backgroundColor;
       }
     }
 }
-
 
 function draw_next_path() {
   computer.postMessage({type: "getNextPath"});
 }
 
-function add_per_block_counts(pbc) {
+ function add_per_block_counts(pbc) {
+  var cont = document.getElementById("tri_container");
   for (var row of cont.children) {
     for (var e of row.children) {
       var paths   = _.has(pbc, e.id) ? pbc[e.id] : 0;
@@ -495,75 +714,11 @@ function add_per_block_counts(pbc) {
         e.style.backgroundColor = "rgb(225, 220, 220)"
       }
 
-      var c = document.createElement("span");
-      c.className = "pbc";
+      var c = e.getElementsByClassName("pbc")[0];
       c.innerHTML = paths;
 
-      e.appendChild(c);
-
     }
   }
-}
-
-function add_pascal_arrangement() {
-  function add(t) {
-    _ADDING_ARR_INPUT = true;
-
-    // create batches
-    var s = _.chunk(
-                t.map(row => row.join(" "))
-                 .join("\n"), 10000)
-             .map(r => r.join(""));
-
-    // add batches
-    var i = document.getElementById("arr_input");
-    i.value = "";
-    var idx = 0;
-    console.log(s.length);
-    setTimeout( function set_arr_onebyone() {
-      if (idx < s.length && _ADDING_ARR_INPUT) {
-        i.value += s[idx++];
-        setTimeout(set_arr_onebyone, 50);
-        (idx%4==0) && (wh.innerHTML = "adding" + (new Array(idx%5+1).join(".")));
-      } else {
-        wh.style.visibility = "hidden";
-        _PASCAL_ARRANGEMENT = [];
-      }
-    }, 0);
-
-  }
-
-  var wh = document.getElementById("wait_hint");
-
-  if (!_ADDING_ARR_INPUT) {
-    var tri = _PASCAL_ARRANGEMENT
-
-    if (tri.length > 150) {
-      Swal.fire({
-        title: "Are you sure?",
-        text:  "These can get really big and possibly slow down your computer",
-        showDenyButton: true,
-        showCancelButton: true,
-        confirmButtonText: "Continue",
-        denyButtonText: "Download (recommended)",
-        cancelButtonText: "Abort",
-      }).then(result => {
-        if (result.isDenied || result.isDismissed) {
-          if (result.isDenied) {
-            post_download(`pascal${tri.length}.txt`);
-          }
-          return;
-        } else {
-          add(tri);
-        }
-      })
-    } else {
-      wh.innerHTML = "adding..";
-      add(tri);
-    }
-
-  }
-
 }
 
 function on_lookup_input_changed() {
@@ -599,6 +754,30 @@ function post_download(suggested) {
   });
 }
 
+function post_parse_input(docompute) {
+  parser.postMessage({
+    type: "parseInput",
+    arrangement: document.getElementById("arr_input").value,
+    docompute: docompute
+  })
+}
+
+function post_new_cmd(keyword, usage, desc, func_body) {
+  parser.postMessage({
+    type: "newCommand",
+    keyword: keyword,
+    usage: usage,
+    desc: desc,
+    func_body: func_body,
+  })
+}
+
+function get_help() {
+  parser.postMessage({
+    type: "getHelp"
+  })
+}
+
 function download_arrangement(url, suggested) {
   var link = document.createElement("a");
   link.setAttribute("download", suggested ?? "arrangement.txt");
@@ -619,22 +798,210 @@ function restart_computer() {
   computer.addEventListener('message', computer_message_f);
 }
 
+function switch_pbc() {
+    if (!IS_SWITCHING) {
+      IS_SWITCHING = true;
+
+      var cont = document.getElementById("tri_container");
+      for (var r of cont.children) {
+        for (var e of r.children) {
+          var cvalue = e.getElementsByClassName('cvalue')[0];
+          var pbc = e.getElementsByClassName('pbc')[0];
+
+          [cvalue.innerHTML, pbc.innerHTML] = [pbc.innerHTML, cvalue.innerHTML];
+        }
+      }
+
+      IS_SWITCHING = false;
+    }
+}
+
+function report_error(msgs) {
+  msgs.forEach(m => console.log(m));
+  Swal.fire({
+    title: "Error!",
+    timer: 5000,
+    timerProgressBar: true,
+    html: msgs.map(m => `<pre style="white-space: pre-wrap; width: 90%">${m}</pre>`).join(""),
+    showConfirmButton: true,
+    toast: true,
+    position: "bottom"
+  });
+}
+
+function get_shader() {
+  try {
+    return new Function("cell", js_codeMirror.getValue());
+  } catch (e) {
+    report_error(["exception in get_shader()", e]);
+    return elt => "";
+  }
+}
+
+function shade(shade) {
+  if (!IS_SHADING) {
+    IS_SHADING=true;
+
+    var shader = shade && get_shader();
+    var cont = document.getElementById("tri_container");
+    try {
+      for (var r of cont.children) {
+        for (var e of r.children) {
+          if (shade) {
+            e.style.backgroundColor = shader(e);
+            e.prevcolor = e.style.backgroundColor;
+          } else {
+            e.style.backgroundColor = "";
+          }
+        }
+      }
+
+    } catch (e) {
+      report_error(["exception in shade()", e]);
+    }
+    IS_SHADED = shade;
+    // document.getElementById("shade_button").innerHTML = IS_SHADED ? "Unshade" : "Shade";
+    IS_SHADING=false;
+  }
+}
+
+function get_and_post_cmd() {
+  Swal.fire({
+    title: "Command Definition",
+    html:
+      '<div style="display: grid; grid-template-columns: max-content max-content; grid-gap: 5px">' +
+      `<label style="text-align: right">CMDNAME:&nbsp</label><input id="keyword">` +
+      `<label style="text-align: right">Usage:&nbsp</label><input id="usage">` +
+      `<label style="text-align: right">Desc:&nbsp</label><input id="desc">` +
+       `</div>`,
+    focusConfirm: false,
+    preConfirm: () => {
+      return {
+        keyword: document.getElementById("keyword").value,
+        usage: document.getElementById("usage").value,
+        desc: document.getElementById("desc").value,
+      }
+    }
+  }).then(({ value: { keyword, usage, desc } }) => {
+    post_new_cmd(keyword, usage, desc, js_codeMirror.getValue());
+  })
+}
+
+function zoom_to_fit(zoom) {
+  var rules = [...[...document.styleSheets].find(s => s.href.endsWith("triangles.css")).cssRules];
+
+  var elem_style = rules.find(r => r.selectorText=="div.elem").style,
+      row_style = rules.find(r => r.selectorText=="div.row").style,
+      text_visibility_style = rules.find(r => r.selectorText=="div.elem > pre, div.elem > span").style
+
+  var c = document.getElementById("tri_container")
+  if (zoom) {
+    var dims = c.getBoundingClientRect(),
+        max_width_in_elems = _.max(c.children, r => r.children.length).children.length,
+        max_height_in_rows = c.children.length
+
+    var new_width = dims.width / max_width_in_elems - 4,
+        new_height = dims.height / max_height_in_rows - 2;
+
+    text_visibility_style.display = "none";
+    elem_style.width = `${new_width}px`;
+    row_style.height = `${new_height}px`;
+
+  } else {
+    elem_style.width = "6.375em";
+    row_style.height = "2.6875em";
+    text_visibility_style.display = "inherit";
+  }
+
+  IS_ZOOMED = zoom;
+  document.getElementById("zoom_button").innerHTML = IS_ZOOMED ? "Unzoom" : "Zoom to fit";
+  [...c.children].forEach(r => r.style.left=0);
+  center_arrangement();
+
+}
+
+function add_select_options_from_object(select, obj, doUpperCase=true) {
+  for (var k of _.keys(obj)) {
+    var o = document.createElement("option");
+    o.value = k;
+    o.innerHTML = doUpperCase ? k.toUpperCase() : k;
+
+    select.appendChild(o);
+  }
+}
+
+function save_function() {
+  Swal.fire({
+    title: "Enter a name for this function",
+    input: "text",
+    inputLabel: "Name: ",
+    inputValidator: value => value=="" ? 'You need to write something' : undefined
+  }).then(({value: name}) => {
+    if (name) {
+      var func = js_codeMirror.getValue();
+      window.localStorage.setItem(name, func);
+
+      if (!_.has(SAVED_FUNCTIONS, name)) {
+        var o = document.createElement("option")
+        o.value = o.innerHTML = name;
+        document.getElementById("func_examples").appendChild(o);
+      }
+
+      SAVED_FUNCTIONS[name] = func;
+    }
+  })
+}
+
+function clear_storage() {
+  window.localStorage.clear();
+  SAVED_FUNCTIONS = {};
+
+  var select = document.getElementById("func_examples");
+  while (select.children[select.children.length-1].value !== "--YOURS--")
+    select.removeChild(select.children[select.children.length-1]);
+}
 function main() {
 
+  postinput_with_restart = _.wrap(post_parse_input, (f, compute) => {
+    shade(false);
+    zoom_to_fit(false);
+    restart_computer();
+    f(compute);
+  });
+
   // add all event listeners
+  window.addEventListener('resize', center_arrangement);
+  document.addEventListener("keypress", e => e.target == document.body && e.key === "?" && get_help());
+
   document.getElementById("anim_button").addEventListener("mouseout", _on_anim_button_mouseleave);
   document.getElementById("anim_button").addEventListener("mouseover", test_can_animate);
 
   document.getElementById("anim_button").addEventListener("click", toggle_animate);
-  document.getElementById("arr_button").addEventListener("click", toggle_arrangement);
-  document.getElementById("create_wpaths").addEventListener("click", () => _.wrap(create_arrangement, f => {
-    restart_computer();
-    f(true);
-  })());
-  document.getElementById("create_wopaths").addEventListener("click", () => create_arrangement(false));
+  document.getElementById("arr_button").addEventListener("click", toggle_arrangement_input_visibility);
+  document.getElementById("create_wpaths").addEventListener("click", e => postinput_with_restart(true))
+  document.getElementById("create_wopaths").addEventListener("click", e => postinput_with_restart(false));
   document.getElementById("create_random").addEventListener("click", choose_random_arrangement);
-  document.getElementById("wait_hint").addEventListener("click", add_pascal_arrangement);
-  document.getElementById("download_button").addEventListener("click", e => post_download())
+  document.getElementById("download_button").addEventListener("click", e => post_download());
+  document.getElementById("shade_button").addEventListener("click", e => shade(true));
+  document.getElementById("unshade_button").addEventListener("click", e => shade(false));
+  document.getElementById("switch_pbc_button").addEventListener("click", e => switch_pbc())
+  document.getElementById("zoom_button").addEventListener('click', e => zoom_to_fit(!IS_ZOOMED));
+  document.getElementById("commands_help").addEventListener('click', get_help);
+  document.getElementById("shader_cmd_help").addEventListener('click', e => {
+    Swal.fire({
+      title: "Help",
+      html: `
+      <h3 style="text-align: left">Shaders:</h3>
+      <pre style="margin-left: 40px; text-align: left; white-space: pre-wrap; width: 90%">${HELPTEXT.SHADERS}</pre>
+      <h3 style="text-align: left">Commands:</h3>
+      <pre style="margin-left: 40px; text-align: left; white-space: pre-wrap; width: 90%">${HELPTEXT.COMMANDS}</pre>
+      <h5 style="text-align: left">Note that in either case, everything you write is treated as the function <i>body</i>. The function signature is decided based on which button you press.</h5>
+      `
+    })
+  });
+  document.getElementById("create_cmd_button").addEventListener('click', get_and_post_cmd);
+  document.getElementById("save_function_button").addEventListener('click', save_function);
+  document.getElementById("clear_storage_button").addEventListener('click', clear_storage);
 
   document.getElementById("n_input").addEventListener("input", on_lookup_input_changed);
   document.getElementById("r_input").addEventListener("input", on_lookup_input_changed);
@@ -643,33 +1010,58 @@ function main() {
     toggle_animate();
   });
 
-  aselect = document.getElementById("pre_options");
-  aselect.addEventListener('change', () => {
-    set_arrangement(PREDEFINED_ARRANGEMENTS[aselect.value]);
-    create_arrangement(true);
-    aselect.selectedIndex = 0;
-  })
-
-  for (k of _.keys(PREDEFINED_ARRANGEMENTS)) {
+  var create_disabled_option = name => {
     var o = document.createElement("option");
-    o.value = k;
-    o.innerHTML = k.toUpperCase();
-
-    aselect.appendChild(o);
+    o.setAttribute("disabled", "");
+    o.innerHTML = name;
+    return o;
   }
 
-  document.getElementById("arr_input").setAttribute("placeholder",
+  var aselect = document.getElementById("pre_options");
+  aselect.addEventListener('change', () => {
+    set_arrangement(PREDEFINED_ARRANGEMENTS[aselect.value]);
+    postinput_with_restart(true);
+    aselect.selectedIndex = 0;
+  })
+  add_select_options_from_object(aselect, PREDEFINED_ARRANGEMENTS);
+
+
+  var sselect = document.getElementById("func_examples");
+  sselect.addEventListener('change', () => {
+    var obj = _.has(PREDEFINED_SHADERS, sselect.value)
+                ? PREDEFINED_SHADERS
+                : _.has(PREDEFINED_COMMANDS, sselect.value)
+                  ? PREDEFINED_COMMANDS
+                  : SAVED_FUNCTIONS ;
+
+    js_codeMirror.setValue(obj[sselect.value]);
+    sselect.selectedIndex = 0;
+  })
+
+  sselect.appendChild(create_disabled_option("--SHADERS--"));
+  add_select_options_from_object(sselect, PREDEFINED_SHADERS);
+
+  sselect.appendChild(create_disabled_option("--COMMANDS--"));
+  add_select_options_from_object(sselect, PREDEFINED_COMMANDS);
+
+  sselect.appendChild(create_disabled_option("--YOURS--"));
+  add_select_options_from_object(sselect, SAVED_FUNCTIONS, false);
+
+
+  var arr_input = document.getElementById("arr_input");
+  arr_input.value = "";
+  arr_input.setAttribute("placeholder",
 `Enter one row per line. Row elements are space separated.
 
-${BLOCKED} denotes a forbidden block (see examples->FORBIDDEN).
+'${BLOCKED}' denotes a forbidden block (see examples->FORBIDDEN).
 
-${SKIP} denotes a skipped block (see examples->SKIP).
+'${SKIP}' denotes a skipped block (see examples->SKIP).
 
-'$pascal ROW' can be used to create Pascal triangles (see examples->PASCAL).
+'[#]' will comment out a line
 
-'$invert' as the first line will invert the following arrangement (see examples->INVERT).`)
+Various commands are available. Click '?' to see what they are and what they do.`)
 
-  cont = document.getElementById("tri_container");
+  var cont = document.getElementById("tri_container");
 
   // handle message from computer
   computer = new Worker("/pascal_triangle/pascalesque/computer.js");
@@ -697,7 +1089,7 @@ ${SKIP} denotes a skipped block (see examples->SKIP).
 
       case "nextPath":
       // console.log(m);
-      cselect = document.getElementById("colorcycle");
+      var cselect = document.getElementById("colorcycle");
       draw_path(m.data.prevpath, "", false);
       draw_path(m.data.path, cselect.value === "nocycle" ? "rgba(65, 223, 208, 255)" : get_next_color(), cselect.value === "blocks");
       break;
@@ -712,17 +1104,6 @@ ${SKIP} denotes a skipped block (see examples->SKIP).
 
       TOO_MANY_PATHS = true;
       PATHS_READY = false;
-      break;
-
-      case "pascalComputed":
-      var t = m.data.tri;
-      setTimeout(create_arrangement, 0, m.data.docompute, t);
-
-      _PASCAL_ARRANGEMENT = t;
-      set_arrangement((m.data.doreverse ? "$invert\n" : "") + `$pascal ${t.length}`);
-      var wh = document.getElementById("wait_hint");
-      wh.innerHTML = `get text for pascal ${t.length}...`;
-      wh.style.visibility = "visible";
       break;
 
       case "test":
@@ -742,6 +1123,46 @@ ${SKIP} denotes a skipped block (see examples->SKIP).
 
     }
   })
+
+  parser = new Worker("/pascal_triangle/pascalesque/parser.js?" + Math.random());
+  parser.addEventListener('message', m => {
+    switch (m.data.type) {
+      case "inputParsed":
+        create_arrangement(m.data.docompute, m.data.arrangement);
+        break;
+
+      case "commandsHelp":
+        Swal.fire({
+          title: "Commands",
+          html: m.data.helptext,
+          grow: "row",
+        })
+        // console.log(m.data.helptext);
+        break;
+
+      case "error":
+        report_error(m.data.msgs);
+        break;
+    }
+  })
+
+  js_codeMirror = CodeMirror.fromTextArea(document.getElementById("js_input"), {
+    lineNumbers: true,
+    mode: {
+      name: "javascript",
+      globalVars: true,
+    },
+    theme: "default",
+    smartIndent: true,
+    extraKeys: {
+      "Ctrl-Space": "autocomplete",
+    },
+    matchBrackets: true,
+    autoCloseTags: true,
+    autoCloseBrackets: true,
+    lineWrapping: true,
+    placeholder: `function body here...`
+  });
 
   // start off with a random arrangement
   // choose_random_arrangement();

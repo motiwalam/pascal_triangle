@@ -1,4 +1,4 @@
-_PREVIOUS_OBJECT_URL = "";
+var _PREVIOUS_OBJECT_URL = "";
 
 
 function save_arrangement(arrangement) {
@@ -17,7 +17,7 @@ function save_arrangement(arrangement) {
   return _PREVIOUS_OBJECT_URL;
 }
 
-addEventListener('message', m => {
+self.addEventListener('message', m => {
     switch(m.data.type) {
       case "createDownloadURL":
       var url = save_arrangement(m.data.current_arrangement);

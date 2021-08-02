@@ -1,17 +1,35 @@
+<!DOCTYPE html>
 <html>
-
   <head>
+    <!-- <meta charset="utf-8"/> -->
     <title>Pascal-esque Triangles</title>
     <link rel="stylesheet" href="/pascal_triangle/pascalesque/triangles.css"/>
+    <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css"/>
+    <link rel="stylesheet" href="https://codemirror.net/theme/monokai.css"/>
+    <link rel="stylesheet" href="https://codemirror.net/addon/hint/show-hint.css"/>
+    <link rel="stylesheet" href="https://codemirror.net/addon/fold/foldgutter.css"/>
+
     <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script defer src="https://codemirror.net/lib/codemirror.js"></script>
+    <script defer src="https://codemirror.net/mode/javascript/javascript.js"></script>
+
+    <script defer src="https://codemirror.net/addon/hint/show-hint.js"></script>
+    <script defer src="https://codemirror.net/addon/hint/javascript-hint.js"></script>
+
+    <script defer src="https://codemirror.net/addon/edit/closebrackets.js"></script>
+    <script defer src="https://codemirror.net/addon/edit/matchbrackets.js"></script>
+    <script defer src="https://codemirror.net/addon/edit/closetag.js"></script>
+
+    <script defer src="https://codemirror.net/addon/display/placeholder.js"></script>
 
     <script src="/pascal_triangle/pascalesque/main.js"></script>
   </head>
 
-  <body onresize="center_arrangement();">
+  <body>
 
-    <div style="width: 22%">
+    <div id="interface_container" style="width: 22vw; height: auto">
 
       <div class="interface">
         Colour Cycle Mode:&nbsp&nbsp <select id="colorcycle">
@@ -22,37 +40,44 @@
               </select>
       </div>
 
-      <div class="interface" style="margin-top: 10px">
-        Animation speed (ms):&nbsp&nbsp <input type="text" id="anim_speed" value=500 style="width: 60px; text-align: center">
+      <div class="interface" style="margin-top: 0.625em">
+        Animation speed (ms):&nbsp&nbsp <input type="text" id="anim_speed" value=500 style="width: 3.75em; text-align: center">
       </div>
 
       <div class="interface">
-        Memory limit (MB):&nbsp&nbsp <input id="m_input" type="text" style="width: 60px; text-align: center" value="1000">
+        Memory limit (MB):&nbsp&nbsp <input id="m_input" type="text" style="width: 3.75em; text-align: center" value="1000">
       </div>
 
       <div class="interface">
-        Compute every <input type="text" id="nthpath_input" value=1 style="width: 60px; text-align: center"> path(s)
+        Compute every <input type="text" id="nthpath_input" value=1 style="width: 3.75em; text-align: center"> path(s)
       </div>
 
       <div class="interface">
-        <span class="tooltip" style="border-bottom: 1px dotted black;">Trim paths by sieve<span class="tooltiptext">When the size of the computed paths exceed the memory limit, the default behaviour is to simply stop storing them. Check this box to instead reduce the size of the paths by half by filtering them out in a sieve-like fashion.</span></span> <input type="checkbox" id="do_trim_input">
-
+        <span class="tooltip" style="border-bottom: 0.0625em dotted black;">Trim paths by sieve<span class="tooltiptext">When the size of the computed paths exceed the memory limit, the default behaviour is to simply stop storing them. Check this box to instead reduce the size of the paths by half by filtering them out in a sieve-like fashion.</span></span> <input type="checkbox" id="do_trim_input">
       </div>
 
+      <div class="interface">
+         <button id="switch_pbc_button">Switch path count and cell value</button>
+      </div>
 
-      <button style="width: 125;" type="submit" id="arr_button" class="mybutton">Hide</button>
-      <button style="width: 110;" type="submit" id="anim_button" class="mybutton">Animate</button>
+      <div class="interface">
+         <button id="zoom_button">Zoom to fit</button>
+      </div>
+
+      <button style="width: 7.8125em;" type="submit" id="arr_button" class="mybutton">Hide</button>
+      <button style="width: 6.875em;" type="submit" id="anim_button" class="mybutton">Animate</button>
       <div class="interface" id="arr_container">
           Total Paths: <pre style="display: inline;" id="pathscount"></pre>
           <div style="position: relative;">
-            <textarea style="width: 100%; scrollbar-width: thin;" id="arr_input" rows=20 cols=44></textarea>
-          <span class="hint" id="wait_hint">get text...</span>
+            <textarea id="arr_input" rows=20 cols=44></textarea>
           <svg id="download_button" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-download" width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
             <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
             <polyline points="7 11 12 16 17 11" />
-            <line x1="12" y1="4" x2="12" y2="16" />
+            <line x1="12" y1="4" x2="12" y2="16" /> 58;24
           </svg>
+
+          <button id="commands_help" style="position: absolute; right: 1px; bottom: 7px; background: GhostWhite">?</button>
       </div>
           <div class="intcontainer">
             <button id="create_wpaths" class="binterface" style="background-color: rgba(39,234,28,255)" type="submit">
@@ -64,21 +89,21 @@
           </div>
 
           <div class="intcontainer">
-          <button id="create_random" class="binterface" style="background-color: rgba(255,180,2,0.7)" type="submit">
-            Random
-          </button>
+            <button id="create_random" class="binterface" style="background-color: rgba(255,180,2,0.7)" type="submit">
+              Random
+            </button>
 
-          <select class="mymenu" style="background: rgba(206,147,255,255); background-color: rgba(206,147,255,255)" id="pre_options">
-            <option disabled selected value="poop"> -- examples -- </option>
-          </select>
-        </div>
+            <select class="mymenu" style="background: rgba(206,147,255,255); background-color: rgba(206,147,255,255)" id="pre_options">
+              <option disabled selected value="poop"> -- examples -- </option>
+            </select>
+          </div>
 
         <br> </br>
 
-        <h3 style="margin-bottom: 5px">Lookup</h3>
+        <h3 style="margin-bottom: 0.3125em">Lookup</h3>
 
         <div class="intcontainer" style="justify-content: start;">
-            <div style="margin-right: 25px">
+            <div style="margin-right: 1.5625em">
               <span> n: </span>
               <input type="text" id="n_input" class="lookup">
             </div>
@@ -95,7 +120,33 @@
         <div class="output">
           <b>Paths to cell:&nbsp&nbsp&nbsp</b><pre id="p_output"></pre>
         </div>
+
+      </div>
+
+
+      <div class="interface" style="width: 200%">
+        <div class="intcontainer" style="justify-content: left">
+          <h3 style="margin-bottom: 0.3125em">Shaders and Commands</h3>
+          <h3 style="margin-bottom: 0.3125em; margin-left: 5px"><button id="shader_cmd_help" style="background: GhostWhite">?</button></h3>
         </div>
+        <textarea id="js_input" style="width: 200%"></textarea>
+        <div class="intcontainer">
+          <button id="shade_button" style="background-color: #d0d0d7;" class="binterface">Shade</button>
+          <button id="create_cmd_button" style="background-color: #d0d0d7;" class="binterface">Create Command</button>
+        </div>
+        <div class="intcontainer">
+          <button id="unshade_button" style="background-color: #d0d0d7;" class="binterface">Unshade</button>
+          <select id="func_examples" style="background-color: #d0d0d7;" class="mymenu">
+            <option disabled selected value="poop"> -- examples -- </option>
+          </select>
+
+        </div>
+
+        <div class="intcontainer" style="justify-content: space-between">
+          <button id="save_function_button" style="background-color: #d0d0d7" class="binterface">Save</button>
+          <button id="clear_storage_button" style="background-color: #d0d0d7" class="binterface">Clear Storage</button>
+        </div>
+      </div>
 
       </div>
 

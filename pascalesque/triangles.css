@@ -28,7 +28,7 @@ div.triangle {
     overflow: auto;
     white-space: nowrap;
     width: 76%;
-    height: 85%;
+    height: 95%;
     margin: 0 auto;
     position: absolute;
     top: 50%;
@@ -43,7 +43,7 @@ div.triangle::-webkit-scrollbar {
 
 div.row {
     position: relative;
-    height: 4.75vh;
+    height: 2.6875em;
     text-align: center;
     z-index: -1;
     white-space: nowrap;
@@ -54,13 +54,17 @@ div.row {
 
 div.elem {
     border: 1px solid #e1c2c2;
-    width: 11vh;
+    width: 6.375em;
     height: 80%;
     display: inline-block;
     position: relative;
 }
 
-div.elem pre {
+div.elem > pre, div.elem > span {
+  display: inherit;
+}
+
+div.elem .cvalue {
     overflow: hidden;
     text-overflow: ellipsis;
     width: 80%;
@@ -72,7 +76,7 @@ div.elem pre {
     transform: translate(-50%, -47%);
 }
 
-div.elem pre:hover {
+div.elem .cvalue:hover {
     overflow: visible;
     background-color: rgb(217, 200, 200);
     width: min-content;
@@ -106,6 +110,7 @@ button.binterface:active {
 select.mymenu {
   border: hidden;
   width: 36%;
+  text-align: center;
 }
 
 select.mymenu:hover {
@@ -118,8 +123,12 @@ select.mymenu:active {
 
 div.interface {
   position: relative;
-  width: 100%;
+  /* width: 100%; */
   margin-top: 5px;
+}
+
+div.interface textarea {
+  width: 100%;
 }
 
 /* Tooltip container */
@@ -161,8 +170,9 @@ div.intcontainer {
 
 #download_button {
   position: absolute;
-  top: 7;
-  right: 7;
+  top: 7px;
+  right: 1px;
+  background: GhostWhite
 }
 
 #download_button:hover {
